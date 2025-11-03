@@ -100,18 +100,18 @@ export async function registerFonts(): Promise<void> {
     console.log('[PDF Fonts] ===== Starting font registration =====')
 
     // Playfair Display - Regular, Bold, Italic
-    // Using Google Fonts TTF URLs with UTF-8 support
+    // Using Google Fonts TTF URLs with UTF-8 support (v40 - updated URLs)
     results.PlayfairDisplay = await registerFontWithTimeout('PlayfairDisplay', [
       {
-        src: 'https://fonts.gstatic.com/s/playfairdisplay/v30/nuFiD-vYSZviVYUb_rj3ij__anPXDTzYhA_-NiXkQ.ttf',
+        src: 'https://fonts.gstatic.com/s/playfairdisplay/v40/nuFvD-vYSZviVYUb_rj3ij__anPXJzDwcbmjWBN2PKdFvUDQ.ttf',
         fontWeight: 'normal',
       },
       {
-        src: 'https://fonts.gstatic.com/s/playfairdisplay/v30/nuFlD-vYSZviVYUb_rj3ij__anPXDTnogkk7yRbPQ.ttf',
+        src: 'https://fonts.gstatic.com/s/playfairdisplay/v40/nuFvD-vYSZviVYUb_rj3ij__anPXJzDwcbmjWBN2PKeiukDQ.ttf',
         fontWeight: 'bold',
       },
       {
-        src: 'https://fonts.gstatic.com/s/playfairdisplay/v30/nuFkD-vYSZviVYUb_rj3ij__anPXDTjYgBM4SDk.ttf',
+        src: 'https://fonts.gstatic.com/s/playfairdisplay/v40/nuFRD-vYSZviVYUb_rj3ij__anPXDTnCjmHKM4nYO7KN_qiTbtY.ttf',
         fontStyle: 'italic',
         fontWeight: 'normal',
       },
