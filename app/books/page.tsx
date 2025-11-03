@@ -482,7 +482,7 @@ export default function BooksPage() {
           filename={viewingBook.filename}
           isOpen={!!viewingBook}
           onClose={() => setViewingBook(null)}
-          basePath={PDF_CONFIG.BASE_URL || '/pdfs'}
+          basePath={PDF_CONFIG.BASE_URL || '/docs'}
           externalUrl={
             isExternalUrl(getPdfUrl(viewingBook.filename))
               ? getPdfUrl(viewingBook.filename)

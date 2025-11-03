@@ -11,7 +11,7 @@ interface PDFModalProps {
   isOpen: boolean
   /** Function called to close the modal */
   onClose: () => void
-  /** Base path for PDFs (default: /pdfs) */
+  /** Base path for PDFs (default: /docs) */
   basePath?: string
   /** External URL for PDF (overrides basePath if provided) */
   externalUrl?: string
@@ -23,7 +23,7 @@ export default function PDFModal({
   filename,
   isOpen,
   onClose,
-  basePath = '/pdfs',
+  basePath = '/docs',
   externalUrl,
   showDownload = true,
 }: PDFModalProps) {
@@ -60,10 +60,13 @@ export default function PDFModal({
       // For external URLs, open in new tab
       window.open(pdfUrl, '_blank', 'noopener,noreferrer')
     } else {
-      // For local files, trigger download
+      // For local files, trigger download directly
+      // Next.js serves files from /public/docs/ as static files
+      // Using the direct path with download attribute forces the browser to download
       const link = document.createElement('a')
-      link.href = `${pdfUrl}?mode=download`
+      link.href = pdfUrl
       link.download = filename
+      link.rel = 'noopener'
       document.body.appendChild(link)
       link.click()
       document.body.removeChild(link)

@@ -8,7 +8,7 @@ import PDFModal from './pdf-modal'
 interface PDFViewButtonProps {
   /** PDF filename */
   filename: string
-  /** Base path for PDFs (default: /pdfs) */
+  /** Base path for PDFs (default: /docs) */
   basePath?: string
   /** Button text */
   label?: string
@@ -22,7 +22,7 @@ interface PDFViewButtonProps {
 
 export default function PDFViewButton({
   filename,
-  basePath = '/pdfs',
+  basePath = '/docs',
   label = 'View PDF',
   showDownload = true,
   variant = 'primary',

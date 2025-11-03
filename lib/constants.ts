@@ -84,7 +84,7 @@ export const SOCIAL_PROOF = {
 
 // External PDF hosting configuration
 // If NEXT_PUBLIC_PDF_BASE_URL is set, PDFs will be served from external URLs
-// Otherwise, they fall back to local /public/pdfs/ files
+// Otherwise, they fall back to local /public/docs/ files
 
 // Helper function to get PDF URL
 export function getPdfUrl(filename: string): string {
@@ -116,14 +116,14 @@ export function getPdfUrl(filename: string): string {
     return `${baseUrl}/${filename}`
   }
 
-  // Fallback to local static files
-  return `/pdfs/${filename}`
+  // Fallback to local static files in /docs/
+  return `/docs/${filename}`
 }
 
 export const PDF_CONFIG = {
   // Base URL for external PDF hosting (e.g., Supabase Storage, S3, Cloudflare R2)
-  // Example: 'https://yourbucket.s3.amazonaws.com' or 'https://xxx.supabase.co/storage/v1/object/public/pdfs'
-  // If not set, uses local /pdfs/ path
+  // Example: 'https://yourbucket.s3.amazonaws.com' or 'https://xxx.supabase.co/storage/v1/object/public/docs'
+  // If not set, uses local /docs/ path
   get BASE_URL() {
     return process.env.NEXT_PUBLIC_PDF_BASE_URL || ''
   },
