@@ -60,8 +60,18 @@ export async function POST(request: Request) {
     }
 
     // Ensure HTTPS in production (except localhost)
-    if (baseUrl.includes('lifeclock.quest') && !baseUrl.startsWith('https://')) {
-      baseUrl = baseUrl.replace('http://', 'https://')
+    try {
+      const parsed = new URL(baseUrl)
+      const isLocalhost = parsed.hostname === 'localhost' || parsed.hostname === '127.0.0.1'
+      if (!isLocalhost && parsed.protocol === 'http:') {
+        parsed.protocol = 'https:'
+        baseUrl = parsed.toString().replace(/\/$/, '')
+      }
+    } catch {
+      // If baseUrl is not a valid URL string, fallback to safe default
+      if (process.env.NEXT_PUBLIC_BASE_URL) {
+        baseUrl = process.env.NEXT_PUBLIC_BASE_URL.replace('http://', 'https://')
+      }
     }
 
     console.log('[Stripe API] Creating session with baseUrl:', baseUrl)
