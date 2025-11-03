@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Download } from 'lucide-react'
 
@@ -24,8 +23,6 @@ export default function StaticPDFDownloadButton({
   className = '',
   variant = 'primary',
 }: StaticPDFDownloadButtonProps) {
-  const [downloading, setDownloading] = useState(false)
-
   // Assure que le chemin commence par /docs/
   const pdfPath = filename.startsWith('/docs/') ? filename : `/docs/${filename}`
   const downloadFilename = downloadName || filename
@@ -39,56 +36,20 @@ export default function StaticPDFDownloadButton({
       'px-4 py-2 border-2 border-blue-600 text-blue-600 rounded hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors',
   }
 
-  const baseClasses = `inline-flex items-center justify-center gap-2 font-semibold disabled:opacity-50 disabled:cursor-not-allowed ${variantStyles[variant]}`
+  const baseClasses = `inline-flex items-center justify-center gap-2 font-semibold ${variantStyles[variant]}`
 
-  const handleDownload = async () => {
-    if (downloading) return
-
-    setDownloading(true)
-    try {
-      // Use fetch to download the file as blob for better reliability
-      // This ensures the PDF is correctly downloaded without corruption
-      const response = await fetch(pdfPath)
-
-      if (!response.ok) {
-        throw new Error(`Failed to download: ${response.status} ${response.statusText}`)
-      }
-
-      // Get the blob from the response
-      const blob = await response.blob()
-
-      // Create a download link with the blob
-      const url = window.URL.createObjectURL(blob)
-      const link = document.createElement('a')
-      link.href = url
-      link.download = downloadFilename
-      link.rel = 'noopener'
-      document.body.appendChild(link)
-
-      try {
-        link.click()
-      } finally {
-        document.body.removeChild(link)
-        window.URL.revokeObjectURL(url)
-      }
-    } catch (error) {
-      console.error('Error downloading PDF:', error)
-      alert('Erreur lors du téléchargement. Veuillez réessayer.')
-    } finally {
-      setDownloading(false)
-    }
-  }
-
+  // Direct link to static file - Next.js serves files from /public/docs/ directly
+  // This ensures no corruption as files are served as-is without any transformation
   return (
-    <motion.button
-      onClick={handleDownload}
-      disabled={downloading}
+    <motion.a
+      href={pdfPath}
+      download={downloadFilename}
       className={`${baseClasses} ${className}`}
-      whileHover={{ scale: downloading ? 1 : 1.02 }}
-      whileTap={{ scale: downloading ? 1 : 0.98 }}
+      whileHover={{ scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
     >
       <Download className="w-5 h-5" />
-      {downloading ? 'Téléchargement...' : label}
-    </motion.button>
+      {label}
+    </motion.a>
   )
 }

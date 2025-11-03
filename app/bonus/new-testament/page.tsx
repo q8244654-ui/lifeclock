@@ -12,34 +12,18 @@ export default function NewTestamentPage() {
   const [downloading, setDownloading] = useState(false)
   const [isViewing, setIsViewing] = useState(false)
 
-  const handleDownload = async () => {
+  const handleDownload = () => {
     setDownloading(true)
     try {
-      // Use fetch to download the file as blob for better reliability
-      // This ensures the PDF is correctly downloaded without corruption
-      const response = await fetch(`/docs/${encodeURIComponent(FILENAME)}`)
-
-      if (!response.ok) {
-        throw new Error(`Failed to download: ${response.status} ${response.statusText}`)
-      }
-
-      // Get the blob from the response
-      const blob = await response.blob()
-
-      // Create a download link with the blob
-      const url = window.URL.createObjectURL(blob)
+      // Direct download from static file - Next.js serves files from /public/docs/ directly
+      // This ensures no corruption as files are served as-is without any transformation
       const link = document.createElement('a')
-      link.href = url
+      link.href = `/docs/${encodeURIComponent(FILENAME)}`
       link.download = FILENAME
       link.rel = 'noopener'
       document.body.appendChild(link)
-
-      try {
-        link.click()
-      } finally {
-        document.body.removeChild(link)
-        window.URL.revokeObjectURL(url)
-      }
+      link.click()
+      document.body.removeChild(link)
     } catch (error) {
       console.error('Error triggering download:', error)
       alert('Erreur lors du téléchargement. Veuillez réessayer.')
