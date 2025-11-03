@@ -5,7 +5,7 @@ import path from 'path'
 
 export const runtime = 'nodejs'
 
-export async function GET(_req: NextRequest, context: { params: Promise<{ filename: string }> }) {
+export async function GET(req: NextRequest, context: { params: Promise<{ filename: string }> }) {
   const { filename: rawName } = await context.params
 
   // Decode URL-encoded filename (handles %20 for spaces, etc.)
@@ -35,13 +35,19 @@ export async function GET(_req: NextRequest, context: { params: Promise<{ filena
     const ext = path.extname(decodedFilename).toLowerCase()
     const contentType = ext === '.pdf' ? 'application/pdf' : 'application/octet-stream'
 
+    // Check query parameter to determine if PDF should be displayed inline or downloaded
+    const { searchParams } = new URL(req.url)
+    const mode = searchParams.get('mode')
+    // If mode=view, display inline. Otherwise, force download (default behavior)
+    const disposition = mode === 'view' ? 'inline' : 'attachment'
+
     // Stream response with correct headers; omit Content-Length to let platform handle it
     return new Response(webStream, {
       status: 200,
       headers: {
         'Content-Type': contentType,
-        // Force download behavior
-        'Content-Disposition': `attachment; filename="${encodeURIComponent(decodedFilename)}"`,
+        // Allow inline viewing when mode=view, otherwise force download
+        'Content-Disposition': `${disposition}; filename="${encodeURIComponent(decodedFilename)}"`,
         'Accept-Ranges': 'bytes',
         'Cache-Control': 'public, max-age=31536000, immutable',
       },

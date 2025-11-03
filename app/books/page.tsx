@@ -3,7 +3,8 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { Download, BookOpen, FileText } from 'lucide-react'
+import { Download, BookOpen, FileText, Eye } from 'lucide-react'
+import { PDFModal } from '@/components/pdf-viewer'
 
 // Phase colors matching the quiz phases
 const PHASE_COLORS = [
@@ -106,6 +107,7 @@ const BOOKS = [
 export default function BooksPage() {
   const router = useRouter()
   const [downloading, setDownloading] = useState<number | null>(null)
+  const [viewingBook, setViewingBook] = useState<(typeof BOOKS)[0] | null>(null)
 
   const handleDownload = (book: (typeof BOOKS)[0]) => {
     setDownloading(book.id)
@@ -336,23 +338,20 @@ export default function BooksPage() {
                     </p>
                   </div>
 
-                  {/* Download Button */}
-                  <motion.button
-                    onClick={() => handleDownload(book)}
-                    disabled={downloading === book.id}
-                    whileHover={{ scale: downloading === book.id ? 1 : 1.02 }}
-                    whileTap={{ scale: downloading === book.id ? 1 : 0.98 }}
-                    className="w-full px-6 py-3 rounded-lg text-[#FAFAFA] font-semibold relative overflow-hidden flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                    style={{
-                      background:
-                        downloading === book.id
-                          ? `linear-gradient(135deg, ${book.color}40 0%, ${book.color}20 100%)`
-                          : `linear-gradient(135deg, ${book.color}80 0%, ${book.color}60 100%)`,
-                      fontFamily: 'var(--font-body)',
-                      boxShadow: `0 4px 16px ${book.color}30`,
-                    }}
-                  >
-                    {downloading !== book.id && (
+                  {/* Action Buttons */}
+                  <div className="flex gap-2">
+                    {/* View Button */}
+                    <motion.button
+                      onClick={() => setViewingBook(book)}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      className="flex-1 px-4 py-3 rounded-lg text-[#FAFAFA] font-semibold relative overflow-hidden flex items-center justify-center gap-2"
+                      style={{
+                        background: `linear-gradient(135deg, ${book.color}60 0%, ${book.color}40 100%)`,
+                        fontFamily: 'var(--font-body)',
+                        boxShadow: `0 4px 16px ${book.color}20`,
+                      }}
+                    >
                       <motion.div
                         className="absolute inset-0"
                         style={{
@@ -369,21 +368,61 @@ export default function BooksPage() {
                           ease: 'easeInOut',
                         }}
                       />
-                    )}
-                    <span className="relative z-10 flex items-center gap-2">
-                      {downloading === book.id ? (
-                        <>
-                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                          Downloading...
-                        </>
-                      ) : (
-                        <>
-                          <Download className="w-4 h-4" />
-                          Download
-                        </>
+                      <span className="relative z-10 flex items-center gap-2">
+                        <Eye className="w-4 h-4" />
+                        Voir
+                      </span>
+                    </motion.button>
+
+                    {/* Download Button */}
+                    <motion.button
+                      onClick={() => handleDownload(book)}
+                      disabled={downloading === book.id}
+                      whileHover={{ scale: downloading === book.id ? 1 : 1.02 }}
+                      whileTap={{ scale: downloading === book.id ? 1 : 0.98 }}
+                      className="flex-1 px-4 py-3 rounded-lg text-[#FAFAFA] font-semibold relative overflow-hidden flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                      style={{
+                        background:
+                          downloading === book.id
+                            ? `linear-gradient(135deg, ${book.color}40 0%, ${book.color}20 100%)`
+                            : `linear-gradient(135deg, ${book.color}80 0%, ${book.color}60 100%)`,
+                        fontFamily: 'var(--font-body)',
+                        boxShadow: `0 4px 16px ${book.color}30`,
+                      }}
+                    >
+                      {downloading !== book.id && (
+                        <motion.div
+                          className="absolute inset-0"
+                          style={{
+                            background:
+                              'radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 70%)',
+                          }}
+                          animate={{
+                            opacity: [0.3, 0.6, 0.3],
+                            scale: [1, 1.2, 1],
+                          }}
+                          transition={{
+                            duration: 2,
+                            repeat: Number.POSITIVE_INFINITY,
+                            ease: 'easeInOut',
+                          }}
+                        />
                       )}
-                    </span>
-                  </motion.button>
+                      <span className="relative z-10 flex items-center gap-2">
+                        {downloading === book.id ? (
+                          <>
+                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                            <span className="hidden sm:inline">Téléchargement...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Download className="w-4 h-4" />
+                            <span className="hidden sm:inline">Télécharger</span>
+                          </>
+                        )}
+                      </span>
+                    </motion.button>
+                  </div>
                 </div>
               </motion.div>
             ))}
@@ -421,6 +460,17 @@ export default function BooksPage() {
           </motion.div>
         </div>
       </div>
+
+      {/* PDF Modal */}
+      {viewingBook && (
+        <PDFModal
+          filename={viewingBook.filename}
+          isOpen={!!viewingBook}
+          onClose={() => setViewingBook(null)}
+          basePath="/docs"
+          showDownload={true}
+        />
+      )}
     </div>
   )
 }

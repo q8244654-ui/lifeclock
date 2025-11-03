@@ -2,8 +2,10 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { BookOpen } from 'lucide-react'
+import { BookOpen, Eye, FileText } from 'lucide-react'
+import { PDFModal } from '@/components/pdf-viewer'
 import { computeLifeClockFinalReport } from '@/lib/compute-life-clock-final-report'
 import { analyzeHiddenForces } from '@/lib/analyze-forces'
 import { generateInsights } from '@/lib/generate-insights'
@@ -27,6 +29,7 @@ export default function ReportPage() {
   const [revelations, setRevelations] = useState<any[]>([])
   const [userName, setUserName] = useState('')
   const [userEmail, setUserEmail] = useState('')
+  const [isViewingPDF, setIsViewingPDF] = useState(false)
 
   function saveReportToSupabase(
     results: PhaseResult[],
@@ -114,13 +117,13 @@ export default function ReportPage() {
       {/* Quick Navigation Buttons */}
       <div className="sticky top-0 z-20 bg-[#0A0A0A]/70 backdrop-blur px-4 py-3 border-b border-white/10">
         <div className="max-w-6xl mx-auto flex items-center gap-3 justify-end">
-          <a
+          <Link
             href="/books"
             className="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-[#FAFAFA] hover:bg-white/10 transition"
             style={{ fontFamily: 'var(--font-body)' }}
           >
             Back to Ebook
-          </a>
+          </Link>
           <a
             href="/bonus/new-testament"
             className="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-[#FAFAFA] hover:bg-white/10 transition"
@@ -354,37 +357,81 @@ export default function ReportPage() {
                   Enjoy this complimentary bonus in digital format
                 </p>
 
-                <motion.a
-                  href="/docs/The%20New%20Testament.pdf"
-                  download
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="px-8 py-4 rounded-xl text-[#0A0A0A] font-semibold relative overflow-hidden inline-flex items-center gap-3"
-                  style={{
-                    background:
-                      'linear-gradient(135deg, rgba(229, 201, 126, 0.9) 0%, rgba(229, 201, 126, 0.7) 100%)',
-                    fontFamily: 'var(--font-body)',
-                    boxShadow: '0 4px 16px rgba(229, 201, 126, 0.3)',
-                  }}
-                >
-                  <motion.div
-                    className="absolute inset-0"
+                <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
+                  {/* View Button */}
+                  <motion.button
+                    onClick={() => setIsViewingPDF(true)}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="px-6 py-4 rounded-xl text-[#0A0A0A] font-semibold relative overflow-hidden flex items-center justify-center gap-3"
                     style={{
                       background:
-                        'radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 70%)',
+                        'linear-gradient(135deg, rgba(229, 201, 126, 0.9) 0%, rgba(229, 201, 126, 0.7) 100%)',
+                      fontFamily: 'var(--font-body)',
+                      boxShadow: '0 4px 16px rgba(229, 201, 126, 0.3)',
                     }}
-                    animate={{ opacity: [0.3, 0.6, 0.3], scale: [1, 1.2, 1] }}
-                    transition={{
-                      duration: 2,
-                      repeat: Number.POSITIVE_INFINITY,
-                      ease: 'easeInOut',
+                  >
+                    <motion.div
+                      className="absolute inset-0"
+                      style={{
+                        background:
+                          'radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 70%)',
+                      }}
+                      animate={{ opacity: [0.3, 0.6, 0.3], scale: [1, 1.2, 1] }}
+                      transition={{
+                        duration: 2,
+                        repeat: Number.POSITIVE_INFINITY,
+                        ease: 'easeInOut',
+                      }}
+                    />
+                    <span className="relative z-10 flex items-center gap-3">
+                      <Eye className="w-5 h-5" />
+                      Voir le PDF
+                    </span>
+                  </motion.button>
+
+                  {/* Download Button */}
+                  <motion.a
+                    href="/docs/The%20New%20Testament.pdf"
+                    download
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="px-6 py-4 rounded-xl text-[#0A0A0A] font-semibold relative overflow-hidden flex items-center justify-center gap-3"
+                    style={{
+                      background:
+                        'linear-gradient(135deg, rgba(229, 201, 126, 0.9) 0%, rgba(229, 201, 126, 0.7) 100%)',
+                      fontFamily: 'var(--font-body)',
+                      boxShadow: '0 4px 16px rgba(229, 201, 126, 0.3)',
                     }}
-                  />
-                  <span className="relative z-10 flex items-center gap-3">
-                    <BookOpen className="w-5 h-5" />
-                    Open PDF
-                  </span>
-                </motion.a>
+                  >
+                    <motion.div
+                      className="absolute inset-0"
+                      style={{
+                        background:
+                          'radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 70%)',
+                      }}
+                      animate={{ opacity: [0.3, 0.6, 0.3], scale: [1, 1.2, 1] }}
+                      transition={{
+                        duration: 2,
+                        repeat: Number.POSITIVE_INFINITY,
+                        ease: 'easeInOut',
+                      }}
+                    />
+                    <span className="relative z-10 flex items-center gap-3">
+                      <FileText className="w-5 h-5" />
+                      Télécharger
+                    </span>
+                  </motion.a>
+                </div>
+
+                {/* PDF Modal */}
+                <PDFModal
+                  filename="The New Testament.pdf"
+                  isOpen={isViewingPDF}
+                  onClose={() => setIsViewingPDF(false)}
+                  basePath="/docs"
+                  showDownload={true}
+                />
               </div>
             </div>
           </motion.div>

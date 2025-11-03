@@ -3,12 +3,14 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
-import { BookOpen, FileText } from 'lucide-react'
+import { BookOpen, FileText, Eye } from 'lucide-react'
+import { PDFModal } from '@/components/pdf-viewer'
 
 const FILENAME = 'The New Testament.pdf'
 
 export default function NewTestamentPage() {
   const [downloading, setDownloading] = useState(false)
+  const [isViewing, setIsViewing] = useState(false)
 
   const handleDownload = () => {
     setDownloading(true)
@@ -154,36 +156,70 @@ export default function NewTestamentPage() {
             </p>
           </motion.div>
 
-          <motion.button
-            onClick={handleDownload}
-            disabled={downloading}
-            whileHover={{ scale: downloading ? 1 : 1.03 }}
-            whileTap={{ scale: downloading ? 1 : 0.98 }}
-            className="w-full px-6 py-4 rounded-xl text-[#0A0A0A] font-semibold relative overflow-hidden flex items-center justify-center gap-3 mx-auto max-w-md font-[var(--font-body)] bg-linear-to-br from-[rgba(229,201,126,0.9)] to-[rgba(229,201,126,0.7)] shadow-[0_4px_16px_rgba(229,201,126,0.3)] disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <motion.div
-              className="absolute inset-0 bg-[radial-gradient(circle,rgba(255,255,255,0.2)_0%,transparent_70%)]"
-              animate={{ opacity: [0.3, 0.6, 0.3], scale: [1, 1.2, 1] }}
-              transition={{
-                duration: 2,
-                repeat: Number.POSITIVE_INFINITY,
-                ease: 'easeInOut',
-              }}
-            />
-            <span className="relative z-10 flex items-center gap-3">
-              {downloading ? (
-                <>
-                  <div className="w-5 h-5 border-2 border-[#0A0A0A] border-t-transparent rounded-full animate-spin" />
-                  Téléchargement...
-                </>
-              ) : (
-                <>
-                  <FileText className="w-5 h-5" />
-                  Télécharger le PDF
-                </>
-              )}
-            </span>
-          </motion.button>
+          <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
+            {/* View Button */}
+            <motion.button
+              onClick={() => setIsViewing(true)}
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.98 }}
+              className="flex-1 px-6 py-4 rounded-xl text-[#0A0A0A] font-semibold relative overflow-hidden flex items-center justify-center gap-3 font-[var(--font-body)] bg-linear-to-br from-[rgba(229,201,126,0.9)] to-[rgba(229,201,126,0.7)] shadow-[0_4px_16px_rgba(229,201,126,0.3)]"
+            >
+              <motion.div
+                className="absolute inset-0 bg-[radial-gradient(circle,rgba(255,255,255,0.2)_0%,transparent_70%)]"
+                animate={{ opacity: [0.3, 0.6, 0.3], scale: [1, 1.2, 1] }}
+                transition={{
+                  duration: 2,
+                  repeat: Number.POSITIVE_INFINITY,
+                  ease: 'easeInOut',
+                }}
+              />
+              <span className="relative z-10 flex items-center gap-3">
+                <Eye className="w-5 h-5" />
+                Voir le PDF
+              </span>
+            </motion.button>
+
+            {/* Download Button */}
+            <motion.button
+              onClick={handleDownload}
+              disabled={downloading}
+              whileHover={{ scale: downloading ? 1 : 1.03 }}
+              whileTap={{ scale: downloading ? 1 : 0.98 }}
+              className="flex-1 px-6 py-4 rounded-xl text-[#0A0A0A] font-semibold relative overflow-hidden flex items-center justify-center gap-3 font-[var(--font-body)] bg-linear-to-br from-[rgba(229,201,126,0.9)] to-[rgba(229,201,126,0.7)] shadow-[0_4px_16px_rgba(229,201,126,0.3)] disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <motion.div
+                className="absolute inset-0 bg-[radial-gradient(circle,rgba(255,255,255,0.2)_0%,transparent_70%)]"
+                animate={{ opacity: [0.3, 0.6, 0.3], scale: [1, 1.2, 1] }}
+                transition={{
+                  duration: 2,
+                  repeat: Number.POSITIVE_INFINITY,
+                  ease: 'easeInOut',
+                }}
+              />
+              <span className="relative z-10 flex items-center gap-3">
+                {downloading ? (
+                  <>
+                    <div className="w-5 h-5 border-2 border-[#0A0A0A] border-t-transparent rounded-full animate-spin" />
+                    <span className="hidden sm:inline">Téléchargement...</span>
+                  </>
+                ) : (
+                  <>
+                    <FileText className="w-5 h-5" />
+                    <span className="hidden sm:inline">Télécharger</span>
+                  </>
+                )}
+              </span>
+            </motion.button>
+          </div>
+
+          {/* PDF Modal */}
+          <PDFModal
+            filename={FILENAME}
+            isOpen={isViewing}
+            onClose={() => setIsViewing(false)}
+            basePath="/docs"
+            showDownload={true}
+          />
 
           <motion.div
             className="text-center mt-10"
