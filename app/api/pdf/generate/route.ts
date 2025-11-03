@@ -89,8 +89,6 @@ export async function POST(request: Request) {
         'Content-Type': 'application/pdf',
         'Content-Disposition': `attachment; filename="LifeClock-${userName}-${Date.now()}.pdf"`,
         'Content-Length': String(size),
-        // Do not set Content-Encoding to prevent Vercel/Next.js automatic compression
-        // Binary files like PDFs should not be compressed
         'Cache-Control': 'no-store',
       },
     })
