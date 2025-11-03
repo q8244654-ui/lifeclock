@@ -221,8 +221,11 @@ export default function NewTestamentPage() {
             </motion.a>
 
             <div className="backdrop-blur-xl border border-white/10 rounded-xl p-6 inline-block bg-linear-to-br from-[rgba(10,10,10,0.8)] to-[rgba(10,10,10,0.4)] shadow-[0_4px_16px_rgba(0,0,0,0.3)]">
-              <p className="text-[#BFBFC2] text-base mb-0 font-[var(--font-body)]">
+              <p className="text-[#BFBFC2] text-base mb-2 font-[var(--font-body)]">
                 Complimentary bonus with your LifeClock access
+              </p>
+              <p className="text-[#E5C97E] text-xl font-bold font-[var(--font-title)]">
+                Value: Priceless
               </p>
             </div>
           </motion.div>
