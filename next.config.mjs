@@ -80,6 +80,33 @@ const nextConfig = {
         source: '/(.*)',
         headers: securityHeaders,
       },
+      // Exception pour les routes PDF avec mode=view - permettre l'affichage en iframe
+      {
+        source: '/docs/:path*',
+        headers: [
+          {
+            key: 'X-Frame-Options',
+            value: 'SAMEORIGIN', // Permet l'affichage en iframe pour le même domaine
+          },
+          {
+            key: 'Content-Security-Policy',
+            value: "frame-ancestors 'self';", // Permet l'embedding depuis le même domaine
+          },
+        ],
+      },
+      {
+        source: '/books/:path*',
+        headers: [
+          {
+            key: 'X-Frame-Options',
+            value: 'SAMEORIGIN', // Permet l'affichage en iframe pour le même domaine
+          },
+          {
+            key: 'Content-Security-Policy',
+            value: "frame-ancestors 'self';", // Permet l'embedding depuis le même domaine
+          },
+        ],
+      },
     ]
   },
   async rewrites() {

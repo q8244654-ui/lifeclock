@@ -42,15 +42,27 @@ export async function GET(req: NextRequest, context: { params: Promise<{ filenam
     const disposition = mode === 'view' ? 'inline' : 'attachment'
 
     // Stream response with correct headers; omit Content-Length to let platform handle it
+    const headers = new Headers({
+      'Content-Type': contentType,
+      // Allow inline viewing when mode=view, otherwise force download
+      'Content-Disposition': `${disposition}; filename="${encodeURIComponent(decodedFilename)}"`,
+      'Accept-Ranges': 'bytes',
+      'Cache-Control': 'public, max-age=31536000, immutable',
+      // Allow embedding in iframe for same origin
+      'X-Frame-Options': 'SAMEORIGIN',
+      'X-Content-Type-Options': 'nosniff',
+    })
+
+    // Only allow iframe embedding when mode=view
+    if (mode === 'view') {
+      headers.set('X-Frame-Options', 'SAMEORIGIN')
+      // Remove Content-Security-Policy restrictions if any
+      headers.delete('Content-Security-Policy')
+    }
+
     return new Response(webStream, {
       status: 200,
-      headers: {
-        'Content-Type': contentType,
-        // Allow inline viewing when mode=view, otherwise force download
-        'Content-Disposition': `${disposition}; filename="${encodeURIComponent(decodedFilename)}"`,
-        'Accept-Ranges': 'bytes',
-        'Cache-Control': 'public, max-age=31536000, immutable',
-      },
+      headers,
     })
   } catch (error: unknown) {
     if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
