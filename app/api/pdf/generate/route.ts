@@ -77,11 +77,13 @@ export async function POST(request: Request) {
     console.log('[PDF API] PDF generated successfully, size:', pdfBuffer.length)
 
     // Return PDF with explicit Content-Length using native Response
-    return new Response(pdfBuffer, {
+    const size = pdfBuffer.length
+    const body = new Uint8Array(pdfBuffer)
+    return new Response(body, {
       headers: {
         'Content-Type': 'application/pdf',
         'Content-Disposition': `attachment; filename="LifeClock-${userName}-${Date.now()}.pdf"`,
-        'Content-Length': String(pdfBuffer.length),
+        'Content-Length': String(size),
         'Cache-Control': 'no-store',
       },
     })
