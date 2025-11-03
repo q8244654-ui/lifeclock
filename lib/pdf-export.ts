@@ -47,15 +47,21 @@ export async function exportPDFReport(data: PDFExportData): Promise<void> {
     // Get the PDF blob
     const blob = await response.blob()
 
-    // Create download link
+    // Create download link (with fallback)
     const url = window.URL.createObjectURL(blob)
     const link = document.createElement('a')
     link.href = url
     link.download = `LifeClock-${userName}-${Date.now()}.pdf`
+    link.rel = 'noopener'
+    // Some browsers or CSPs may block programmatic click; open in new tab as fallback
+    link.target = '_blank'
     document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-    window.URL.revokeObjectURL(url)
+    try {
+      link.click()
+    } finally {
+      document.body.removeChild(link)
+      window.URL.revokeObjectURL(url)
+    }
   } catch (error) {
     if (error instanceof Error) {
       throw error
@@ -63,6 +69,3 @@ export async function exportPDFReport(data: PDFExportData): Promise<void> {
     throw new Error('Failed to export PDF. Please try again.')
   }
 }
-
-
-

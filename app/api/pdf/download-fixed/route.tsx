@@ -13,18 +13,25 @@ export async function GET() {
     // Create the PDF document component
     const doc = React.createElement(SimplePDFDocument)
     const pdfInstance = pdf(doc)
-    // Prefer Blob to avoid ArrayBuffer/Stream typing issues across runtimes
-    const blob = await pdfInstance.toBlob()
-    const size = blob.size
+    // Use Node-friendly buffer for predictable Content-Length
+    const buffer: Buffer = await new Promise((resolve, reject) => {
+      pdfInstance
+        .toBuffer()
+        .then((buf: Buffer) => resolve(buf))
+        .catch((err: unknown) => reject(err))
+    })
+    const size = buffer.length
     console.log(
       '[PDF Fixed] PDF generated successfully',
       size !== undefined ? `(size: ${size} bytes)` : '(stream)'
     )
 
-    return new NextResponse(blob, {
+    return new Response(buffer, {
       headers: {
         'Content-Type': 'application/pdf',
         'Content-Disposition': 'attachment; filename="LifeClock-Report.pdf"',
+        'Content-Length': String(size),
+        'Cache-Control': 'no-store',
       },
     })
   } catch (error) {
