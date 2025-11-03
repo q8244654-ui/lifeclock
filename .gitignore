@@ -33,5 +33,5 @@ lifeclock-project.zip
 package-lock.json
 
 # ebooks dupliqués (servir depuis public/books uniquement)
-app/books/*.pdf
 public/books/ebook-*.pdf
+!public/books/ebook-7.pdf
