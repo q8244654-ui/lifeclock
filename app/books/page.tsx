@@ -111,16 +111,33 @@ export default function BooksPage() {
     setDownloading(book.id)
     
     try {
-      // Create download link to PDF
+      // Fetch the PDF with credentials to include cookies
+      const response = await fetch(`/books/${encodeURIComponent(book.filename)}`, {
+        method: 'GET',
+        credentials: 'include',
+      })
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
+      // Convert response to blob
+      const blob = await response.blob()
+      
+      // Create download link from blob
+      const url = window.URL.createObjectURL(blob)
       const link = document.createElement('a')
-      link.href = `/books/${book.filename}`
-      link.download = `${book.filename}`
+      link.href = url
+      link.download = book.filename
       document.body.appendChild(link)
       link.click()
       document.body.removeChild(link)
+      
+      // Clean up the blob URL
+      window.URL.revokeObjectURL(url)
     } catch (error) {
       console.error('Error downloading book:', error)
-      alert('Error downloading book. Please try again.')
+      alert('Erreur lors du téléchargement. Veuillez réessayer.')
     } finally {
       setTimeout(() => {
         setDownloading(null)
