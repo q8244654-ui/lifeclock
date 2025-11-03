@@ -4,6 +4,8 @@ import crypto from 'crypto'
 import { promises as fs } from 'fs'
 import path from 'path'
 
+export const runtime = 'nodejs'
+
 function verifySignature(value: string, sig: string, secret: string) {
   const expected = crypto.createHmac('sha256', secret).update(value).digest('hex')
   return crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(sig))
@@ -54,6 +56,7 @@ export async function GET(_req: NextRequest, context: { params: Promise<{ filena
         'Content-Type': contentType,
         // Force download behavior to mirror previous public/ behavior
         'Content-Disposition': `attachment; filename="${encodeURIComponent(decodedFilename)}"`,
+        'Content-Length': String(stat.size),
         'Cache-Control': 'public, max-age=31536000, immutable',
       },
     })
