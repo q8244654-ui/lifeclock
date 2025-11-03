@@ -1,9 +1,9 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { promises as fs } from 'fs'
 import path from 'path'
 
-export async function GET(_req: Request, { params }: { params: { filename: string } }) {
-  const rawName = params.filename
+export async function GET(_req: NextRequest, context: { params: Promise<{ filename: string }> }) {
+  const { filename: rawName } = await context.params
 
   // Basic sanitization: disallow path traversal
   if (!rawName || rawName.includes('..') || rawName.includes('/')) {
