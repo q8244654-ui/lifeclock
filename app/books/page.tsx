@@ -112,17 +112,16 @@ export default function BooksPage() {
   const handleDownload = (book: (typeof BOOKS)[0]) => {
     setDownloading(book.id)
     try {
-      // Téléchargement direct via la route API qui sert les fichiers de public/docs
-      // sans compression, identiques aux fichiers originaux
+      // Direct download from /public/pdfs/ (static files served by CDN)
       const link = document.createElement('a')
-      link.href = `/docs/${encodeURIComponent(book.filename)}`
+      link.href = `/pdfs/${encodeURIComponent(book.filename)}`
       link.download = book.filename
       document.body.appendChild(link)
       link.click()
       document.body.removeChild(link)
     } catch (error) {
       console.error('Error triggering download:', error)
-      alert('Erreur lors du téléchargement. Veuillez réessayer.')
+      alert('Error downloading. Please try again.')
     } finally {
       setTimeout(() => {
         setDownloading(null)
@@ -370,7 +369,7 @@ export default function BooksPage() {
                       />
                       <span className="relative z-10 flex items-center gap-2">
                         <Eye className="w-4 h-4" />
-                        Voir
+                        View
                       </span>
                     </motion.button>
 
@@ -412,12 +411,12 @@ export default function BooksPage() {
                         {downloading === book.id ? (
                           <>
                             <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                            <span className="hidden sm:inline">Téléchargement...</span>
+                            <span className="hidden sm:inline">Downloading...</span>
                           </>
                         ) : (
                           <>
                             <Download className="w-4 h-4" />
-                            <span className="hidden sm:inline">Télécharger</span>
+                            <span className="hidden sm:inline">Download</span>
                           </>
                         )}
                       </span>
@@ -467,7 +466,7 @@ export default function BooksPage() {
           filename={viewingBook.filename}
           isOpen={!!viewingBook}
           onClose={() => setViewingBook(null)}
-          basePath="/docs"
+          basePath="/pdfs"
           showDownload={true}
         />
       )}

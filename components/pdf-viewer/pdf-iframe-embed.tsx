@@ -1,24 +1,24 @@
 'use client'
 
 interface PDFIframeEmbedProps {
-  /** Nom du fichier PDF à afficher */
+  /** PDF filename to display */
   filename: string
-  /** Hauteur de l'iframe */
+  /** Iframe height */
   height?: string
-  /** Chemin de base pour les PDFs (par défaut: /docs) */
+  /** Base path for PDFs (default: /pdfs) */
   basePath?: string
-  /** Classes CSS supplémentaires */
+  /** Additional CSS classes */
   className?: string
 }
 
 /**
- * Composant simple pour afficher un PDF dans une iframe
- * Utilise le visualiseur PDF natif du navigateur
+ * Simple component to display a PDF in an iframe
+ * Uses the browser's native PDF viewer
  */
 export default function PDFIframeEmbed({
   filename,
   height = '600px',
-  basePath = '/docs',
+  basePath = '/pdfs',
   className = '',
 }: PDFIframeEmbedProps) {
   const pdfUrl = `${basePath}/${encodeURIComponent(filename)}`

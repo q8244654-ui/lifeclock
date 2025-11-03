@@ -5,15 +5,15 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { X, Download } from 'lucide-react'
 
 interface PDFModalProps {
-  /** Nom du fichier PDF à afficher */
+  /** PDF filename to display */
   filename: string
-  /** Indique si la modal est ouverte */
+  /** Whether the modal is open */
   isOpen: boolean
-  /** Fonction appelée pour fermer la modal */
+  /** Function called to close the modal */
   onClose: () => void
-  /** Chemin de base pour les PDFs (par défaut: /docs) */
+  /** Base path for PDFs (default: /pdfs) */
   basePath?: string
-  /** Afficher le bouton de téléchargement */
+  /** Show download button */
   showDownload?: boolean
 }
 
@@ -21,10 +21,10 @@ export default function PDFModal({
   filename,
   isOpen,
   onClose,
-  basePath = '/docs',
+  basePath = '/pdfs',
   showDownload = true,
 }: PDFModalProps) {
-  // Fermer avec la touche Escape
+  // Close with Escape key
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isOpen) {
@@ -35,7 +35,7 @@ export default function PDFModal({
     return () => document.removeEventListener('keydown', handleEscape)
   }, [isOpen, onClose])
 
-  // Empêcher le scroll du body quand la modal est ouverte
+  // Prevent body scroll when modal is open
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden'
@@ -76,7 +76,7 @@ export default function PDFModal({
             className="bg-[#1A1A1A] rounded-xl w-full max-w-6xl h-[90vh] relative shadow-2xl"
             onClick={e => e.stopPropagation()}
           >
-            {/* Header avec boutons */}
+            {/* Header with buttons */}
             <div className="absolute top-0 left-0 right-0 z-20 bg-gradient-to-b from-black/80 to-transparent p-4 flex justify-between items-center">
               <h3 className="text-white font-semibold text-sm truncate flex-1 mr-4">{filename}</h3>
               <div className="flex gap-2">
@@ -86,7 +86,7 @@ export default function PDFModal({
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
                     className="bg-[#2A2A2A] hover:bg-[#3A3A3A] text-white p-2 rounded-lg transition-colors"
-                    title="Télécharger"
+                    title="Download"
                   >
                     <Download className="w-5 h-5" />
                   </motion.button>
@@ -96,14 +96,14 @@ export default function PDFModal({
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
                   className="bg-[#2A2A2A] hover:bg-[#3A3A3A] text-white p-2 rounded-lg transition-colors"
-                  title="Fermer"
+                  title="Close"
                 >
                   <X className="w-5 h-5" />
                 </motion.button>
               </div>
             </div>
 
-            {/* Iframe avec le PDF */}
+            {/* Iframe with PDF */}
             <iframe
               src={`${pdfUrl}?mode=view`}
               className="w-full h-full rounded-xl"
@@ -114,10 +114,10 @@ export default function PDFModal({
               }}
             />
 
-            {/* Footer avec instructions (optionnel) */}
+            {/* Footer with instructions (optional) */}
             <div className="absolute bottom-0 left-0 right-0 z-20 bg-gradient-to-t from-black/80 to-transparent p-4">
               <p className="text-white/60 text-xs text-center">
-                Appuyez sur <kbd className="bg-white/10 px-2 py-1 rounded">ESC</kbd> pour fermer
+                Press <kbd className="bg-white/10 px-2 py-1 rounded">ESC</kbd> to close
               </p>
             </div>
           </motion.div>

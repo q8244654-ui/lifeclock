@@ -6,24 +6,24 @@ import { Eye, Download } from 'lucide-react'
 import PDFModal from './pdf-modal'
 
 interface PDFViewButtonProps {
-  /** Nom du fichier PDF */
+  /** PDF filename */
   filename: string
-  /** Chemin de base pour les PDFs (par défaut: /docs) */
+  /** Base path for PDFs (default: /pdfs) */
   basePath?: string
-  /** Texte du bouton */
+  /** Button text */
   label?: string
-  /** Afficher aussi l'option téléchargement */
+  /** Also show download option */
   showDownload?: boolean
-  /** Variante du style */
+  /** Style variant */
   variant?: 'primary' | 'secondary' | 'outline'
-  /** Classes CSS supplémentaires */
+  /** Additional CSS classes */
   className?: string
 }
 
 export default function PDFViewButton({
   filename,
-  basePath = '/docs',
-  label = 'Voir le PDF',
+  basePath = '/pdfs',
+  label = 'View PDF',
   showDownload = true,
   variant = 'primary',
   className = '',
