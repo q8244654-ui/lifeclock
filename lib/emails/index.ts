@@ -47,7 +47,12 @@ if (!resendApiKey) {
 
 const resend = resendApiKey ? new Resend(resendApiKey) : null
 
-async function sendEmail(to: string, subject: string, html: string, attachments?: Array<{ filename: string; content: Buffer | string }>) {
+async function sendEmail(
+  to: string,
+  subject: string,
+  html: string,
+  attachments?: Array<{ filename: string; content: Buffer | string }>
+) {
   if (!resend) {
     console.warn(`[Email] Would send to ${to}: ${subject}`)
     return { success: false, error: 'Resend not configured' }
@@ -55,13 +60,13 @@ async function sendEmail(to: string, subject: string, html: string, attachments?
 
   try {
     console.log(`[Email] Attempting to send email to ${to} with subject: ${subject}`)
-    
+
     const result = await resend.emails.send({
       from: fromEmail,
       to,
       subject,
       html,
-      attachments: attachments?.map((att) => ({
+      attachments: attachments?.map(att => ({
         filename: att.filename,
         content: typeof att.content === 'string' ? Buffer.from(att.content) : att.content,
       })),
@@ -70,9 +75,8 @@ async function sendEmail(to: string, subject: string, html: string, attachments?
     // Type guard pour vérifier si result contient une erreur
     if (result && typeof result === 'object' && 'error' in result && result.error) {
       const error = result.error
-      const errorMessage = typeof error === 'object' 
-        ? JSON.stringify(error, null, 2)
-        : String(error)
+      const errorMessage =
+        typeof error === 'object' ? JSON.stringify(error, null, 2) : String(error)
       console.error('[Email] Error sending email:', {
         to,
         subject,
@@ -105,7 +109,7 @@ async function sendEmail(to: string, subject: string, html: string, attachments?
 
 export async function sendPaymentConfirmationEmail(data: PaymentConfirmationData) {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://lifeclock.quest'
     const reportUrl = data.reportUrl || `${baseUrl}/report`
     const booksUrl = data.booksUrl || `${baseUrl}/books`
     const bonusUrl = data.bonusUrl || `${baseUrl}/bonus/new-testament`
@@ -114,7 +118,12 @@ export async function sendPaymentConfirmationEmail(data: PaymentConfirmationData
     try {
       // Dynamic import to avoid Next.js client-side bundling
       const { generateReportPDF } = await import('./pdf-generator')
-      pdfBuffer = await generateReportPDF(data.reportData, data.forces, data.revelations, data.userName)
+      pdfBuffer = await generateReportPDF(
+        data.reportData,
+        data.forces,
+        data.revelations,
+        data.userName
+      )
     } catch (error) {
       console.error('[Email] Error generating PDF:', error)
       // Continue without PDF if generation fails
@@ -339,4 +348,3 @@ export async function sendReportRecoveryEmail(data: ReportRecoveryData) {
     return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
   }
 }
-
