@@ -5,12 +5,15 @@ import path from 'path'
 export async function GET(_req: NextRequest, context: { params: Promise<{ filename: string }> }) {
   const { filename: rawName } = await context.params
 
+  // Decode URL-encoded filename (handles %20 for spaces, etc.)
+  const decodedFilename = decodeURIComponent(rawName)
+
   // Basic sanitization: disallow path traversal
-  if (!rawName || rawName.includes('..') || rawName.includes('/')) {
+  if (!decodedFilename || decodedFilename.includes('..') || decodedFilename.includes('/')) {
     return new NextResponse('Invalid file name', { status: 400 })
   }
 
-  const filePath = path.join(process.cwd(), 'app', 'books', rawName)
+  const filePath = path.join(process.cwd(), 'app', 'books', decodedFilename)
 
   try {
     const stat = await fs.stat(filePath)
@@ -21,7 +24,7 @@ export async function GET(_req: NextRequest, context: { params: Promise<{ filena
     const fileBuffer = await fs.readFile(filePath)
 
     // Infer content type from extension (PDF primary use-case)
-    const ext = path.extname(rawName).toLowerCase()
+    const ext = path.extname(decodedFilename).toLowerCase()
     const contentType = ext === '.pdf' ? 'application/pdf' : 'application/octet-stream'
 
     return new NextResponse(fileBuffer, {
@@ -29,7 +32,7 @@ export async function GET(_req: NextRequest, context: { params: Promise<{ filena
       headers: {
         'Content-Type': contentType,
         // Force download behavior to mirror previous public/ behavior
-        'Content-Disposition': `attachment; filename="${encodeURIComponent(rawName)}"`,
+        'Content-Disposition': `attachment; filename="${encodeURIComponent(decodedFilename)}"`,
         'Cache-Control': 'public, max-age=31536000, immutable',
       },
     })
