@@ -1,7 +1,7 @@
 /**
  * Generate a beautiful PDF report with modern UI design
  * Using @react-pdf/renderer for proper UTF-8 encoding and typography
- * 
+ *
  * This file MUST only be used server-side (API routes, server actions, etc.)
  */
 
@@ -9,10 +9,7 @@ import React from 'react'
 import { pdf } from '@react-pdf/renderer'
 import { Document, Page, View, Text } from '@react-pdf/renderer'
 import { registerFonts } from './pdf-fonts'
-import {
-  PDFRevelationCard,
-  PDFTransition,
-} from './pdf-components'
+import { PDFRevelationCard, PDFTransition } from './pdf-components'
 import { spacing } from './pdf-styles'
 
 // Register fonts before first use
@@ -35,9 +32,10 @@ const LifeClockDocument: React.FC<{
   userName: string
 }> = ({ reportData, forces, revelations, userName }) => {
   const cardsPerPage = 3
-  const revelationPages = revelations && revelations.length > 0
-    ? Array.from({ length: Math.ceil(revelations.length / cardsPerPage) })
-    : []
+  const revelationPages =
+    revelations && revelations.length > 0
+      ? Array.from({ length: Math.ceil(revelations.length / cardsPerPage) })
+      : []
 
   const validUserName = userName || 'User'
 
@@ -161,8 +159,7 @@ const LifeClockDocument: React.FC<{
 
         // Strategic transition points
         const shouldAddTransition =
-          pageIdx === 0 ||
-          pageIdx === Math.floor(revelationPages.length / 2)
+          pageIdx === 0 || pageIdx === Math.floor(revelationPages.length / 2)
 
         const transitionPhrases = [
           '— The revelations begin —',
@@ -262,7 +259,9 @@ const LifeClockDocument: React.FC<{
                   bottom: 8,
                   fontSize: 8,
                   color: '#A0A0A0',
-                  ...(isOdd ? { right: spacing.page.marginOuter } : { left: spacing.page.marginOuter }),
+                  ...(isOdd
+                    ? { right: spacing.page.marginOuter }
+                    : { left: spacing.page.marginOuter }),
                 }}
               >
                 {pageNumber}
@@ -287,18 +286,19 @@ function validateAndNormalizeForces(forces: any): any {
 
   // Create a safe copy with only valid properties
   const normalized: any = {}
-  
+
   // Validate each force (shadow, fear, power)
   const forceKeys = ['shadow', 'fear', 'power'] as const
   for (const key of forceKeys) {
     const force = forces[key]
     if (force && typeof force === 'object' && !Array.isArray(force) && force !== null) {
       normalized[key] = {
-        phase: force.phase && typeof force.phase === 'object' && !Array.isArray(force.phase)
-          ? {
-              title: typeof force.phase.title === 'string' ? force.phase.title : undefined,
-            }
-          : undefined,
+        phase:
+          force.phase && typeof force.phase === 'object' && !Array.isArray(force.phase)
+            ? {
+                title: typeof force.phase.title === 'string' ? force.phase.title : undefined,
+              }
+            : undefined,
         insight: typeof force.insight === 'string' ? force.insight : undefined,
       }
       // Remove undefined properties
@@ -326,15 +326,15 @@ function cleanObject(obj: any): any {
   if (obj === null || obj === undefined) {
     return {}
   }
-  
+
   if (Array.isArray(obj)) {
     return obj.map(cleanObject)
   }
-  
+
   if (typeof obj !== 'object') {
     return obj
   }
-  
+
   const cleaned: any = {}
   for (const key in obj) {
     if (Object.prototype.hasOwnProperty.call(obj, key)) {
@@ -344,7 +344,7 @@ function cleanObject(obj: any): any {
       }
     }
   }
-  
+
   return cleaned
 }
 
@@ -360,7 +360,7 @@ function validateAndNormalizeRevelations(revelations: any[]): any[] {
   }
 
   const MAX_REVELATIONS = 47
-  
+
   const normalized = revelations
     .map((rev, index) => {
       // Skip invalid revelations
@@ -372,33 +372,39 @@ function validateAndNormalizeRevelations(revelations: any[]): any[] {
       // Create a safe revelation object with only valid properties
       // Always provide defaults to avoid undefined
       const normalized: any = {
-        title: typeof rev.title === 'string' && rev.title.trim().length > 0 
-          ? rev.title.trim() 
-          : `Revelation ${index + 1}`,
-        icon: typeof rev.icon === 'string' && rev.icon.length > 0 
-          ? String(rev.icon).replace(/[🌑😨⚡🔮]/g, '○').trim() 
-          : '○',
-        category: typeof rev.category === 'string' && rev.category.length > 0
-          ? rev.category
-          : 'phase',
-        insight: typeof rev.insight === 'string' && rev.insight.trim().length > 0
-          ? rev.insight.trim()
-          : typeof rev.text === 'string' && rev.text.trim().length > 0
-          ? rev.text.trim()
-          : `Insight ${index + 1}`,
+        title:
+          typeof rev.title === 'string' && rev.title.trim().length > 0
+            ? rev.title.trim()
+            : `Revelation ${index + 1}`,
+        icon:
+          typeof rev.icon === 'string' && rev.icon.length > 0
+            ? String(rev.icon)
+                .replace(/[🌑😨⚡🔮]/g, '○')
+                .trim()
+            : '○',
+        category:
+          typeof rev.category === 'string' && rev.category.length > 0 ? rev.category : 'phase',
+        insight:
+          typeof rev.insight === 'string' && rev.insight.trim().length > 0
+            ? rev.insight.trim()
+            : typeof rev.text === 'string' && rev.text.trim().length > 0
+              ? rev.text.trim()
+              : `Insight ${index + 1}`,
       }
 
       // Clean the object to remove any remaining undefined/null
       const cleaned = cleanObject(normalized)
-      
+
       // Only return if it has at least title or insight
-      return (cleaned.title || cleaned.insight) ? cleaned : null
+      return cleaned.title || cleaned.insight ? cleaned : null
     })
     .filter((rev): rev is any => rev !== null && rev !== undefined)
     .slice(0, MAX_REVELATIONS) // Limit to 47 revelations maximum
 
   if (revelations.length > MAX_REVELATIONS) {
-    console.log(`[PDF Generator] Limited revelations from ${revelations.length} to ${MAX_REVELATIONS} for PDF report`)
+    console.log(
+      `[PDF Generator] Limited revelations from ${revelations.length} to ${MAX_REVELATIONS} for PDF report`
+    )
   }
 
   // Final cleanup pass
@@ -409,7 +415,12 @@ function validateAndNormalizeRevelations(revelations: any[]): any[] {
  * Validate and normalize report data
  */
 function validateAndNormalizeReportData(reportData: any): any {
-  if (!reportData || typeof reportData !== 'object' || Array.isArray(reportData) || reportData === null) {
+  if (
+    !reportData ||
+    typeof reportData !== 'object' ||
+    Array.isArray(reportData) ||
+    reportData === null
+  ) {
     console.warn('[PDF Generator] Invalid reportData, using default values')
     return {
       lifeIndex: { lifeIndex: 0, stage: 'Unknown' },
@@ -420,17 +431,16 @@ function validateAndNormalizeReportData(reportData: any): any {
   // Create a safe copy
   const normalized: any = {
     lifeIndex: {
-      lifeIndex: typeof reportData.lifeIndex?.lifeIndex === 'number' 
-        ? reportData.lifeIndex.lifeIndex 
-        : 0,
-      stage: typeof reportData.lifeIndex?.stage === 'string'
-        ? reportData.lifeIndex.stage
-        : 'Unknown',
+      lifeIndex:
+        typeof reportData.lifeIndex?.lifeIndex === 'number' ? reportData.lifeIndex.lifeIndex : 0,
+      stage:
+        typeof reportData.lifeIndex?.stage === 'string' ? reportData.lifeIndex.stage : 'Unknown',
     },
     profile: {
-      dominantEnergy: typeof reportData.profile?.dominantEnergy === 'string'
-        ? reportData.profile.dominantEnergy
-        : 'Unknown',
+      dominantEnergy:
+        typeof reportData.profile?.dominantEnergy === 'string'
+          ? reportData.profile.dominantEnergy
+          : 'Unknown',
     },
   }
 
@@ -456,17 +466,16 @@ export async function generateReportPDF(
     })
 
     // Validate and normalize userName
-    const validUserName = typeof userName === 'string' && userName.trim().length > 0
-      ? userName.trim()
-      : 'User'
-    
+    const validUserName =
+      typeof userName === 'string' && userName.trim().length > 0 ? userName.trim() : 'User'
+
     console.log('[PDF Generator] Validating and normalizing data...')
-    
+
     // Validate and normalize all data before use
     const validReportData = cleanObject(validateAndNormalizeReportData(reportData))
     const validForces = cleanObject(validateAndNormalizeForces(forces))
     const validRevelations = validateAndNormalizeRevelations(revelations)
-    
+
     // Final safety check: ensure revelations array is clean
     if (!Array.isArray(validRevelations) || validRevelations.length === 0) {
       throw new Error('No valid revelations found. Cannot generate PDF without revelations.')
@@ -502,77 +511,89 @@ export async function generateReportPDF(
       console.log('[PDF Generator] Creating PDF instance from document...')
       const pdfInstance = pdf(doc)
       console.log('[PDF Generator] PDF instance created successfully, generating buffer...')
-      
-      console.log('[PDF Generator] Calling toBuffer()...')
-      const buffer = await pdfInstance.toBuffer()
+
+      console.log('[PDF Generator] Calling toBlob()...')
+      const blob = await pdfInstance.toBlob()
+      const arrayBuffer = await blob.arrayBuffer()
+      const buffer = Buffer.from(arrayBuffer)
       console.log('[PDF Generator] Buffer generated successfully, size:', buffer.length, 'bytes')
-      
+
       if (!buffer || buffer.length === 0) {
         console.error('[PDF Generator] Generated PDF buffer is empty or null')
         throw new Error('Generated PDF buffer is empty')
       }
-      
+
       console.log('[PDF Generator] PDF generation completed successfully')
       return buffer
     } catch (renderError) {
       console.error('[PDF Generator] ========== PDF Rendering Error ==========')
       console.error('[PDF Generator] Error type:', typeof renderError)
       console.error('[PDF Generator] Error value:', renderError)
-      
+
       if (renderError instanceof Error) {
         console.error('[PDF Generator] Error name:', renderError.name)
         console.error('[PDF Generator] Error message:', renderError.message)
         console.error('[PDF Generator] Error stack:', renderError.stack)
-        
+
         // Check for specific error patterns
         if (renderError.message.includes('hasOwnProperty')) {
-          console.error('[PDF Generator] HAS_OWN_PROPERTY_ERROR: This suggests an issue with object prototype or data structure')
+          console.error(
+            '[PDF Generator] HAS_OWN_PROPERTY_ERROR: This suggests an issue with object prototype or data structure'
+          )
         }
         if (renderError.message.includes('undefined')) {
           console.error('[PDF Generator] UNDEFINED_ERROR: This suggests missing data or properties')
         }
       } else {
-        console.error('[PDF Generator] Non-Error object thrown:', JSON.stringify(renderError, null, 2))
+        console.error(
+          '[PDF Generator] Non-Error object thrown:',
+          JSON.stringify(renderError, null, 2)
+        )
       }
-      
+
       console.error('[PDF Generator] Document structure check:', {
         hasReportData: !!validReportData,
         reportDataKeys: validReportData ? Object.keys(validReportData) : [],
         forcesKeys: Object.keys(validForces),
         revelationsCount: validRevelations.length,
       })
-      
+
       console.error('[PDF Generator] =========================================')
-      
+
       // Provide more helpful error messages
       let errorMessage = 'Failed to generate PDF report'
       if (renderError instanceof Error) {
         if (renderError.message.includes('hasOwnProperty')) {
-          errorMessage = 'PDF generation error: Invalid data structure detected. Please ensure all revelations are properly formatted.'
+          errorMessage =
+            'PDF generation error: Invalid data structure detected. Please ensure all revelations are properly formatted.'
         } else if (renderError.message.includes('undefined')) {
-          errorMessage = 'PDF generation error: Missing required data. Please try refreshing and ensure all revelations are revealed.'
+          errorMessage =
+            'PDF generation error: Missing required data. Please try refreshing and ensure all revelations are revealed.'
         } else {
           errorMessage = `PDF generation error: ${renderError.message}`
         }
       } else {
         errorMessage = `PDF generation error: ${String(renderError)}`
       }
-      
+
       throw new Error(errorMessage)
     }
   } catch (error) {
     console.error('[PDF Generator] ========== PDF Generation Error ==========')
     console.error('[PDF Generator] Outer catch block - error type:', typeof error)
     console.error('[PDF Generator] Outer catch block - error value:', error)
-    
+
     if (error instanceof Error) {
       console.error('[PDF Generator] Error name:', error.name)
       console.error('[PDF Generator] Error message:', error.message)
       console.error('[PDF Generator] Error stack:', error.stack)
     } else {
-      console.error('[PDF Generator] Non-Error object in outer catch:', JSON.stringify(error, null, 2))
+      console.error(
+        '[PDF Generator] Non-Error object in outer catch:',
+        JSON.stringify(error, null, 2)
+      )
     }
-    
+
     console.error('[PDF Generator] ===========================================')
     throw error
   }
