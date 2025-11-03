@@ -25,7 +25,7 @@ const BOOKS = [
     id: 1, 
     phase: 1,
     title: "The Self Revelation", 
-    filename: "book-1.pdf", 
+    filename: "ebook-1_compressed.pdf", 
     description: "Explore the depths of your hidden identity and unlock your true self",
     color: PHASE_COLORS[0]
   },
@@ -33,7 +33,7 @@ const BOOKS = [
     id: 2, 
     phase: 2,
     title: "Mastering Your Forces", 
-    filename: "book-2.pdf", 
+    filename: "ebook-2_compressed.pdf", 
     description: "Learn to channel your inner power and harness your hidden strengths",
     color: PHASE_COLORS[1]
   },
@@ -41,7 +41,7 @@ const BOOKS = [
     id: 3, 
     phase: 3,
     title: "Overcoming Your Fears", 
-    filename: "book-3.pdf", 
+    filename: "ebook-3_compressed.pdf", 
     description: "Transform your fears into engines of growth and transformation",
     color: PHASE_COLORS[2]
   },
@@ -49,7 +49,7 @@ const BOOKS = [
     id: 4, 
     phase: 4,
     title: "The Heart's Energy", 
-    filename: "book-4.pdf", 
+    filename: "ebook-4_compressed.pdf", 
     description: "Discover the secrets of your authentic heart and emotional core",
     color: PHASE_COLORS[3]
   },
@@ -57,7 +57,7 @@ const BOOKS = [
     id: 5, 
     phase: 5,
     title: "Time and Wisdom", 
-    filename: "book-5.pdf", 
+    filename: "ebook-5_compressed.pdf", 
     description: "Understand your relationship with time and inner maturity",
     color: PHASE_COLORS[4]
   },
@@ -65,7 +65,7 @@ const BOOKS = [
     id: 6, 
     phase: 6,
     title: "Inner Abundance", 
-    filename: "book-6.pdf", 
+    filename: "ebook-6_compressed.pdf", 
     description: "Create prosperity from your essence and true nature",
     color: PHASE_COLORS[5]
   },
@@ -73,7 +73,7 @@ const BOOKS = [
     id: 7, 
     phase: 7,
     title: "The Body as Temple", 
-    filename: "book-7.pdf", 
+    filename: "ebook-7_compressed.pdf", 
     description: "Honor and heal your physical vessel with mindful awareness",
     color: PHASE_COLORS[6]
   },
@@ -81,7 +81,7 @@ const BOOKS = [
     id: 8, 
     phase: 8,
     title: "Liberating Discipline", 
-    filename: "book-8.pdf", 
+    filename: "ebook-8_compressed.pdf", 
     description: "Build structures that set you free rather than confine you",
     color: PHASE_COLORS[7]
   },
@@ -89,7 +89,7 @@ const BOOKS = [
     id: 9, 
     phase: 9,
     title: "The Eternal Spirit", 
-    filename: "book-9.pdf", 
+    filename: "ebook-9_compressed.pdf", 
     description: "Connect with your spiritual dimension and eternal essence",
     color: PHASE_COLORS[8]
   },
@@ -97,7 +97,7 @@ const BOOKS = [
     id: 10, 
     phase: 10,
     title: "Your Legacy", 
-    filename: "book-10.pdf", 
+    filename: "ebook-10_compressed.pdf", 
     description: "Create an impact that transcends your existence and echoes through time",
     color: PHASE_COLORS[9]
   },

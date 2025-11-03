@@ -134,7 +134,7 @@ export default function NewTestamentPage() {
           </motion.div>
 
           <motion.a
-            href="/books/The%20New%20Testament.pdf"
+            href="/books/The%20New%20Testament_compressed.pdf"
             target="_blank"
             rel="noopener noreferrer"
             whileHover={{ scale: 1.03 }}
