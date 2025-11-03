@@ -28,6 +28,43 @@ export default function ReportPage() {
   const [userName, setUserName] = useState("")
   const [userEmail, setUserEmail] = useState("")
 
+  function saveReportToSupabase(
+    results: PhaseResult[],
+    report: any,
+    hiddenForces: any,
+    insights: any[],
+    onboardingData: any,
+  ) {
+    ;(async () => {
+      try {
+        const supabase = createClient()
+
+        if (!onboardingData) return
+
+        const onboarding = onboardingData
+
+        const reportData = {
+          email: onboarding.email,
+          name: onboarding.name,
+          age: onboarding.age,
+          gender: onboarding.gender,
+          life_index: report.lifeIndex.lifeIndex,
+          stage: report.lifeIndex.stage,
+          dominant_energy: report.profile.dominantEnergy,
+          phase_results: results,
+          hidden_forces: hiddenForces,
+          insights: insights,
+          full_report: report,
+        }
+
+        await supabase.from("reports").insert(reportData)
+        // Report saving is silent - errors don't affect UX as data is in localStorage
+      } catch {
+        // Silent error handling - report data is available in localStorage
+      }
+    })()
+  }
+
   useEffect(() => {
     const storedResults = getLocalStorage<PhaseResult[]>(STORAGE_KEYS.PHASES_RESULTS) || 
                           getLocalStorage<PhaseResult[]>(STORAGE_KEYS.ALL_RESULTS)
@@ -58,41 +95,6 @@ export default function ReportPage() {
 
     setLoading(false)
   }, [router])
-
-  const saveReportToSupabase = async (
-    results: PhaseResult[],
-    report: any,
-    hiddenForces: any,
-    insights: any[],
-    onboardingData: any,
-  ) => {
-    try {
-      const supabase = createClient()
-
-      if (!onboardingData) return
-
-      const onboarding = onboardingData
-
-      const reportData = {
-        email: onboarding.email,
-        name: onboarding.name,
-        age: onboarding.age,
-        gender: onboarding.gender,
-        life_index: report.lifeIndex.lifeIndex,
-        stage: report.lifeIndex.stage,
-        dominant_energy: report.profile.dominantEnergy,
-        phase_results: results,
-        hidden_forces: hiddenForces,
-        insights: insights,
-        full_report: report,
-      }
-
-      await supabase.from("reports").insert(reportData)
-      // Report saving is silent - errors don't affect UX as data is in localStorage
-    } catch {
-      // Silent error handling - report data is available in localStorage
-    }
-  }
 
   if (loading || !finalReport) {
     return (
@@ -337,7 +339,7 @@ export default function ReportPage() {
               </p>
 
               <motion.a
-                href="/books/The%20New%20Testament.pdf"
+                href="/books/The%20New%20Testament_compressed.pdf"
                 target="_blank"
                 rel="noopener noreferrer"
                 whileHover={{ scale: 1.05 }}
