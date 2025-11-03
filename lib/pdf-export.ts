@@ -1,6 +1,6 @@
 /**
  * Client-side utility function to download PDF report
- * Opens a direct link to a static PDF file in public/docs
+ * Generates PDF dynamically via API route
  */
 
 export interface PDFExportData {
@@ -9,12 +9,6 @@ export interface PDFExportData {
   forces: any
   revelations: any[]
 }
-
-/**
- * Configuration: nom du fichier PDF statique dans public/docs
- * Changez cette valeur pour pointer vers votre fichier de rapport PDF
- */
-const REPORT_PDF_FILENAME = 'LifeClock-Report.pdf' // Modifiez selon votre fichier
 
 export async function exportPDFReport(data: PDFExportData): Promise<void> {
   const { userName, finalReport, forces, revelations } = data
@@ -30,12 +24,32 @@ export async function exportPDFReport(data: PDFExportData): Promise<void> {
   }
 
   try {
-    // Créer un lien direct vers le fichier PDF statique dans public/docs
-    const pdfPath = `/docs/${encodeURIComponent(REPORT_PDF_FILENAME)}`
+    // Appeler l'API pour générer le PDF dynamiquement
+    const response = await fetch('/api/pdf/generate', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        userName,
+        finalReport,
+        forces,
+        revelations,
+      }),
+    })
 
-    // Créer et déclencher le téléchargement
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ error: 'Unknown error' }))
+      throw new Error(errorData.error || 'Failed to generate PDF')
+    }
+
+    // Récupérer le blob du PDF
+    const blob = await response.blob()
+
+    // Créer un lien de téléchargement
+    const url = window.URL.createObjectURL(blob)
     const link = document.createElement('a')
-    link.href = pdfPath
+    link.href = url
     link.download = `LifeClock-${userName}-${Date.now()}.pdf`
     link.rel = 'noopener'
     document.body.appendChild(link)
@@ -43,6 +57,7 @@ export async function exportPDFReport(data: PDFExportData): Promise<void> {
       link.click()
     } finally {
       document.body.removeChild(link)
+      window.URL.revokeObjectURL(url)
     }
   } catch (error) {
     if (error instanceof Error) {
