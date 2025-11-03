@@ -1,3 +1,4 @@
+'use client'
 import { Suspense } from 'react'
 import { motion } from 'framer-motion'
 import PaymentSuccessClient from './payment-success-client'

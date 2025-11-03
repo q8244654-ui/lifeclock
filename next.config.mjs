@@ -39,7 +39,7 @@ const securityHeaders = [
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;",
       "img-src 'self' data: blob: https://*.vercel-storage.com https://files.stripe.com https://q.stripe.com https://m.stripe.com;",
       "font-src 'self' https://fonts.gstatic.com;",
-      "connect-src 'self' https://api.stripe.com https://r.stripe.com https://m.stripe.com https://*.supabase.co https://*.ingest.sentry.io https://o*.ingest.sentry.io https://vitals.vercel-insights.com;",
+      "connect-src 'self' https://api.stripe.com https://r.stripe.com https://m.stripe.com https://*.supabase.co https://*.ingest.sentry.io https://vitals.vercel-insights.com;",
       "frame-src 'self' https://js.stripe.com https://checkout.stripe.com;",
       "frame-ancestors 'none';",
       "base-uri 'self';",
