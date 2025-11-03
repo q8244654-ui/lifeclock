@@ -47,14 +47,12 @@ export async function exportPDFReport(data: PDFExportData): Promise<void> {
     // Get the PDF blob
     const blob = await response.blob()
 
-    // Create download link (with fallback)
+    // Create download link
     const url = window.URL.createObjectURL(blob)
     const link = document.createElement('a')
     link.href = url
     link.download = `LifeClock-${userName}-${Date.now()}.pdf`
     link.rel = 'noopener'
-    // Some browsers or CSPs may block programmatic click; open in new tab as fallback
-    link.target = '_blank'
     document.body.appendChild(link)
     try {
       link.click()
