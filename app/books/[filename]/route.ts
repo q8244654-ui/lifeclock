@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server'
-import { readFileSync, statSync } from 'fs'
+import { createReadStream, statSync } from 'fs'
+import { Readable } from 'stream'
 import path from 'path'
 
 export const runtime = 'nodejs'
@@ -26,24 +27,22 @@ export async function GET(_req: NextRequest, context: { params: Promise<{ filena
       return new Response('Not found', { status: 404 })
     }
 
-    // Read file synchronously to ensure exact binary match
-    const fileBuffer = readFileSync(filePath)
+    // Create a stream to serve the file as-is without buffering/transformation
+    const nodeStream = createReadStream(filePath)
+    const webStream = Readable.toWeb(nodeStream) as ReadableStream
 
     // Infer content type from extension (PDF primary use-case)
     const ext = path.extname(decodedFilename).toLowerCase()
     const contentType = ext === '.pdf' ? 'application/pdf' : 'application/octet-stream'
 
-    // Use native Response (not NextResponse) with Buffer directly converted to Uint8Array
-    // This ensures exact binary transmission without any transformation
-    const fileBody = new Uint8Array(fileBuffer)
-
-    return new Response(fileBody, {
+    // Stream response with correct headers; omit Content-Length to let platform handle it
+    return new Response(webStream, {
       status: 200,
       headers: {
         'Content-Type': contentType,
         // Force download behavior
         'Content-Disposition': `attachment; filename="${encodeURIComponent(decodedFilename)}"`,
-        'Content-Length': String(stat.size),
+        'Accept-Ranges': 'bytes',
         'Cache-Control': 'public, max-age=31536000, immutable',
       },
     })
