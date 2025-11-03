@@ -194,7 +194,7 @@ export default function NewTestamentPage() {
               />
               <span className="relative z-10 flex items-center gap-3">
                 <Download className="w-5 h-5" />
-                <span className="hidden sm:inline">Télécharger</span>
+                <span className="hidden sm:inline">Download</span>
                 <ExternalLink className="w-4 h-4" />
               </span>
             </motion.a>
