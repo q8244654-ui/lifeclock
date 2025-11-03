@@ -1,33 +1,10 @@
-'use client'
-
-import { useEffect, Suspense } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { Suspense } from 'react'
 import { motion } from 'framer-motion'
+import PaymentSuccessClient from './payment-success-client'
+
+export const dynamic = 'force-dynamic'
 
 export default function PaymentSuccessPage() {
-  const router = useRouter()
-  const searchParams = useSearchParams()
-
-  useEffect(() => {
-    const sessionId = searchParams.get('session_id')
-    ;(async () => {
-      try {
-        if (sessionId) {
-          await fetch('/api/payment/confirm', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ session_id: sessionId }),
-          })
-        }
-      } catch {}
-    })()
-
-    const t = setTimeout(() => {
-      router.replace('/bonus/new-testament')
-    }, 5000)
-    return () => clearTimeout(t)
-  }, [router, searchParams])
-
   return (
     <Suspense
       fallback={
@@ -131,6 +108,9 @@ export default function PaymentSuccessPage() {
                 aria-label="Loading"
               />
             </motion.div>
+
+            {/* Client-side side effects and redirect */}
+            <PaymentSuccessClient />
           </motion.div>
         </div>
       </div>
