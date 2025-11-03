@@ -34,3 +34,4 @@ package-lock.json
 
 # ebooks dupliqués (servir depuis public/books uniquement)
 app/books/*.pdf
+public/books/ebook-*.pdf
