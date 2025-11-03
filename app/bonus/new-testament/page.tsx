@@ -1,16 +1,16 @@
-"use client"
+'use client'
 
-import { motion } from "framer-motion"
-import Image from "next/image"
-import { BookOpen, FileText } from "lucide-react"
+import { motion } from 'framer-motion'
+import Image from 'next/image'
+import { BookOpen, FileText } from 'lucide-react'
 
 export default function NewTestamentPage() {
   return (
     <motion.div
       className="bg-[#0A0A0A] text-white"
-      initial={{ opacity: 0, y: 8, filter: "blur(2px)" }}
-      animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-      transition={{ duration: 0.6, ease: "easeOut" }}
+      initial={{ opacity: 0, y: 8, filter: 'blur(2px)' }}
+      animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+      transition={{ duration: 0.6, ease: 'easeOut' }}
     >
       {/* Hero Section (matching style from ebooks page) */}
       <div className="relative min-h-screen flex items-center justify-center bg-[#0A0A0A] overflow-hidden">
@@ -19,7 +19,7 @@ export default function NewTestamentPage() {
           className="absolute inset-0 flex items-center justify-center pointer-events-none"
           initial={{ opacity: 0, scale: 0.5 }}
           animate={{ opacity: [0, 0.6, 0.4], scale: [0.5, 1.2, 1] }}
-          transition={{ duration: 15, ease: "easeInOut" }}
+          transition={{ duration: 15, ease: 'easeInOut' }}
         >
           <motion.div
             className="w-[600px] h-[600px] rounded-full bg-[radial-gradient(circle,rgba(229,201,126,0.4)_0%,rgba(229,201,126,0.1)_40%,transparent_70%)] blur-[80px]"
@@ -30,7 +30,7 @@ export default function NewTestamentPage() {
             transition={{
               duration: 8,
               repeat: Number.POSITIVE_INFINITY,
-              ease: "easeInOut",
+              ease: 'easeInOut',
             }}
           />
         </motion.div>
@@ -50,7 +50,7 @@ export default function NewTestamentPage() {
           <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            transition={{ type: "spring", delay: 0.2 }}
+            transition={{ type: 'spring', delay: 0.2 }}
             className="inline-block mb-6 mt-12"
           >
             <div className="w-24 h-24 rounded-2xl bg-[#E5C97E]/20 border border-[#E5C97E]/30 flex items-center justify-center">
@@ -62,7 +62,7 @@ export default function NewTestamentPage() {
             className="text-[#FAFAFA] text-2xl md:text-4xl font-semibold tracking-wide uppercase font-[var(--font-title)]"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
+            transition={{ duration: 0.8, ease: 'easeOut' }}
           >
             The New Testament
           </motion.h1>
@@ -75,14 +75,12 @@ export default function NewTestamentPage() {
             transition={{ delay: 0.2, duration: 0.6 }}
           >
             <div className="mx-auto max-w-2xl bg-white/5 border border-white/10 rounded-xl p-5 text-center">
-              <p
-                className="text-[#BFBFC2] text-base md:text-lg font-[var(--font-body)]"
-              >
-                Thank you for taking the time to be here. This bonus wasn’t originally planned, but it felt essential to offer it to you. It’s our way of acknowledging your attention and your trust. Enjoy it to the fullest.
+              <p className="text-[#BFBFC2] text-base md:text-lg font-[var(--font-body)]">
+                Thank you for taking the time to be here. This bonus wasn’t originally planned, but
+                it felt essential to offer it to you. It’s our way of acknowledging your attention
+                and your trust. Enjoy it to the fullest.
               </p>
-              <p
-                className="text-[#BFBFC2] text-sm md:text-base italic mt-3 font-[var(--font-body)]"
-              >
+              <p className="text-[#BFBFC2] text-sm md:text-base italic mt-3 font-[var(--font-body)]">
                 — The LifeClock team • May God bless you
               </p>
             </div>
@@ -123,9 +121,7 @@ export default function NewTestamentPage() {
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
           >
-            <h2
-              className="text-3xl md:text-4xl font-bold text-[#FAFAFA] mb-4 uppercase tracking-wide font-[var(--font-title)]"
-            >
+            <h2 className="text-3xl md:text-4xl font-bold text-[#FAFAFA] mb-4 uppercase tracking-wide font-[var(--font-title)]">
               Bonus Access
             </h2>
             <p className="text-[#BFBFC2] text-lg font-[var(--font-body)]">
@@ -135,8 +131,7 @@ export default function NewTestamentPage() {
 
           <motion.a
             href="/books/The%20New%20Testament_compressed.pdf"
-            target="_blank"
-            rel="noopener noreferrer"
+            download
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.98 }}
             className="w-full px-6 py-4 rounded-xl text-[#0A0A0A] font-semibold relative overflow-hidden flex items-center justify-center gap-3 mx-auto max-w-md font-[var(--font-body)] bg-linear-to-br from-[rgba(229,201,126,0.9)] to-[rgba(229,201,126,0.7)] shadow-[0_4px_16px_rgba(229,201,126,0.3)]"
@@ -147,7 +142,7 @@ export default function NewTestamentPage() {
               transition={{
                 duration: 2,
                 repeat: Number.POSITIVE_INFINITY,
-                ease: "easeInOut",
+                ease: 'easeInOut',
               }}
             />
             <span className="relative z-10 flex items-center gap-3">
@@ -176,12 +171,8 @@ export default function NewTestamentPage() {
               </span>
             </motion.a>
 
-            <div
-              className="backdrop-blur-xl border border-white/10 rounded-xl p-6 inline-block bg-linear-to-br from-[rgba(10,10,10,0.8)] to-[rgba(10,10,10,0.4)] shadow-[0_4px_16px_rgba(0,0,0,0.3)]"
-            >
-              <p
-                className="text-[#BFBFC2] text-base mb-0 font-[var(--font-body)]"
-              >
+            <div className="backdrop-blur-xl border border-white/10 rounded-xl p-6 inline-block bg-linear-to-br from-[rgba(10,10,10,0.8)] to-[rgba(10,10,10,0.4)] shadow-[0_4px_16px_rgba(0,0,0,0.3)]">
+              <p className="text-[#BFBFC2] text-base mb-0 font-[var(--font-body)]">
                 Complimentary bonus with your LifeClock access
               </p>
             </div>
@@ -191,5 +182,3 @@ export default function NewTestamentPage() {
     </motion.div>
   )
 }
-
-

@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
 import crypto from 'crypto'
 import { promises as fs } from 'fs'
 import path from 'path'
@@ -22,18 +21,7 @@ export async function GET(_req: NextRequest, context: { params: Promise<{ filena
     return new NextResponse('Invalid file name', { status: 400 })
   }
 
-  // Optional protection: require paid cookie signature like in app/books/layout.tsx
-  const cookieSecret = process.env.PAY_COOKIE_SECRET
-  if (!cookieSecret) {
-    return new NextResponse('Forbidden', { status: 403 })
-  }
-
-  const cookieStore = await cookies()
-  const email = cookieStore.get('lc_paid_email')?.value || ''
-  const sig = cookieStore.get('lc_paid_sig')?.value || ''
-  if (!email || !sig || !verifySignature(email, sig, cookieSecret)) {
-    return new NextResponse('Forbidden', { status: 403 })
-  }
+  // Public access: no cookie/secret required
 
   // Serve files from public/books in production
   const filePath = path.join(process.cwd(), 'public', 'books', decodedFilename)
