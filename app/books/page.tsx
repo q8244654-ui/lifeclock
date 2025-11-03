@@ -110,7 +110,8 @@ export default function BooksPage() {
   const handleDownload = (book: (typeof BOOKS)[0]) => {
     setDownloading(book.id)
     try {
-      // Create a direct download link to the static file in public/docs
+      // Téléchargement direct via la route API qui sert les fichiers de public/docs
+      // sans compression, identiques aux fichiers originaux
       const link = document.createElement('a')
       link.href = `/docs/${encodeURIComponent(book.filename)}`
       link.download = book.filename

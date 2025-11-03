@@ -1,10 +1,35 @@
 'use client'
 
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import { BookOpen, FileText } from 'lucide-react'
 
+const FILENAME = 'The New Testament.pdf'
+
 export default function NewTestamentPage() {
+  const [downloading, setDownloading] = useState(false)
+
+  const handleDownload = () => {
+    setDownloading(true)
+    try {
+      // Téléchargement direct via la route API qui sert les fichiers de public/docs
+      // sans compression, identiques aux fichiers originaux
+      const link = document.createElement('a')
+      link.href = `/docs/${encodeURIComponent(FILENAME)}`
+      link.download = FILENAME
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+    } catch (error) {
+      console.error('Error triggering download:', error)
+      alert('Erreur lors du téléchargement. Veuillez réessayer.')
+    } finally {
+      setTimeout(() => {
+        setDownloading(false)
+      }, 600)
+    }
+  }
   return (
     <motion.div
       className="bg-[#0A0A0A] text-white"
@@ -129,12 +154,12 @@ export default function NewTestamentPage() {
             </p>
           </motion.div>
 
-          <motion.a
-            href="/docs/The%20New%20Testament.pdf"
-            download
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.98 }}
-            className="w-full px-6 py-4 rounded-xl text-[#0A0A0A] font-semibold relative overflow-hidden flex items-center justify-center gap-3 mx-auto max-w-md font-[var(--font-body)] bg-linear-to-br from-[rgba(229,201,126,0.9)] to-[rgba(229,201,126,0.7)] shadow-[0_4px_16px_rgba(229,201,126,0.3)]"
+          <motion.button
+            onClick={handleDownload}
+            disabled={downloading}
+            whileHover={{ scale: downloading ? 1 : 1.03 }}
+            whileTap={{ scale: downloading ? 1 : 0.98 }}
+            className="w-full px-6 py-4 rounded-xl text-[#0A0A0A] font-semibold relative overflow-hidden flex items-center justify-center gap-3 mx-auto max-w-md font-[var(--font-body)] bg-linear-to-br from-[rgba(229,201,126,0.9)] to-[rgba(229,201,126,0.7)] shadow-[0_4px_16px_rgba(229,201,126,0.3)] disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <motion.div
               className="absolute inset-0 bg-[radial-gradient(circle,rgba(255,255,255,0.2)_0%,transparent_70%)]"
@@ -146,10 +171,19 @@ export default function NewTestamentPage() {
               }}
             />
             <span className="relative z-10 flex items-center gap-3">
-              <FileText className="w-5 h-5" />
-              Open PDF
+              {downloading ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-[#0A0A0A] border-t-transparent rounded-full animate-spin" />
+                  Téléchargement...
+                </>
+              ) : (
+                <>
+                  <FileText className="w-5 h-5" />
+                  Télécharger le PDF
+                </>
+              )}
             </span>
-          </motion.a>
+          </motion.button>
 
           <motion.div
             className="text-center mt-10"

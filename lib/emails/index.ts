@@ -1,4 +1,6 @@
 import { Resend } from 'resend'
+import { readFile } from 'fs/promises'
+import path from 'path'
 import type {
   PaymentConfirmationData,
   AbandonedCartData,
@@ -28,7 +30,12 @@ import {
   getAdminNewPaymentTemplate,
   getAdminMilestoneTemplate,
 } from './templates'
-// PDF generator is imported dynamically to avoid Next.js client-side bundling issues
+
+/**
+ * Configuration: nom du fichier PDF statique dans public/docs
+ * Ce fichier sera envoyé en pièce jointe dans les emails de confirmation
+ */
+const REPORT_PDF_FILENAME = 'LifeClock-Report.pdf' // Modifiez selon votre fichier
 
 const resendApiKey = process.env.RESEND_API_KEY
 const fromEmail = process.env.RESEND_FROM_EMAIL || 'noreply@lifeclock.quest'
@@ -116,17 +123,13 @@ export async function sendPaymentConfirmationEmail(data: PaymentConfirmationData
 
     let pdfBuffer: Buffer | null = null
     try {
-      // Dynamic import to avoid Next.js client-side bundling
-      const { generateReportPDF } = await import('./pdf-generator')
-      pdfBuffer = await generateReportPDF(
-        data.reportData,
-        data.forces,
-        data.revelations,
-        data.userName
-      )
+      // Lire le fichier PDF statique depuis public/docs
+      const filePath = path.join(process.cwd(), 'public', 'docs', REPORT_PDF_FILENAME)
+      pdfBuffer = await readFile(filePath)
+      console.log('[Email] PDF file loaded successfully:', filePath)
     } catch (error) {
-      console.error('[Email] Error generating PDF:', error)
-      // Continue without PDF if generation fails
+      console.error('[Email] Error reading PDF file:', error)
+      // Continue without PDF if file not found
     }
 
     const html = getPaymentConfirmationTemplate({

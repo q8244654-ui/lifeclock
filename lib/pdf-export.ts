@@ -1,6 +1,6 @@
 /**
- * Client-side utility function to export PDF report
- * Calls the API endpoint and handles PDF download
+ * Client-side utility function to download PDF report
+ * Opens a direct link to a static PDF file in public/docs
  */
 
 export interface PDFExportData {
@@ -9,6 +9,12 @@ export interface PDFExportData {
   forces: any
   revelations: any[]
 }
+
+/**
+ * Configuration: nom du fichier PDF statique dans public/docs
+ * Changez cette valeur pour pointer vers votre fichier de rapport PDF
+ */
+const REPORT_PDF_FILENAME = 'LifeClock-Report.pdf' // Modifiez selon votre fichier
 
 export async function exportPDFReport(data: PDFExportData): Promise<void> {
   const { userName, finalReport, forces, revelations } = data
@@ -24,35 +30,12 @@ export async function exportPDFReport(data: PDFExportData): Promise<void> {
   }
 
   try {
-    // Call the API endpoint
-    const response = await fetch('/api/pdf/generate', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        userName,
-        reportData: finalReport,
-        forces,
-        revelations,
-      }),
-    })
+    // Créer un lien direct vers le fichier PDF statique dans public/docs
+    const pdfPath = `/docs/${encodeURIComponent(REPORT_PDF_FILENAME)}`
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
-      const errorMessage = errorData.error || `Failed to generate PDF: ${response.statusText}`
-      throw new Error(errorMessage)
-    }
-
-    // Get the PDF as ArrayBuffer for proper binary handling
-    // This ensures the binary data is not corrupted during transmission
-    const arrayBuffer = await response.arrayBuffer()
-    const blob = new Blob([arrayBuffer], { type: 'application/pdf' })
-
-    // Create download link
-    const url = window.URL.createObjectURL(blob)
+    // Créer et déclencher le téléchargement
     const link = document.createElement('a')
-    link.href = url
+    link.href = pdfPath
     link.download = `LifeClock-${userName}-${Date.now()}.pdf`
     link.rel = 'noopener'
     document.body.appendChild(link)
@@ -60,12 +43,11 @@ export async function exportPDFReport(data: PDFExportData): Promise<void> {
       link.click()
     } finally {
       document.body.removeChild(link)
-      window.URL.revokeObjectURL(url)
     }
   } catch (error) {
     if (error instanceof Error) {
       throw error
     }
-    throw new Error('Failed to export PDF. Please try again.')
+    throw new Error('Failed to download PDF. Please try again.')
   }
 }
