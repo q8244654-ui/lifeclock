@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { cookies } from 'next/headers'
+import crypto from 'crypto'
 import path from 'path'
 import { promises as fs } from 'fs'
 
@@ -7,6 +9,24 @@ export async function GET(
   _request: NextRequest,
   context: { params: Promise<{ filename: string }> }
 ) {
+  const cookieSecret = process.env.PAY_COOKIE_SECRET
+  if (!cookieSecret) {
+    return new NextResponse('Unauthorized', { status: 401 })
+  }
+
+  // Verify access cookie
+  try {
+    const cookieStore = await cookies()
+    const email = cookieStore.get('lc_paid_email')?.value || ''
+    const sig = cookieStore.get('lc_paid_sig')?.value || ''
+    const expected = crypto.createHmac('sha256', cookieSecret).update(email).digest('hex')
+    const ok = email && sig && crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(sig))
+    if (!ok) {
+      return new NextResponse('Forbidden', { status: 403 })
+    }
+  } catch {
+    return new NextResponse('Forbidden', { status: 403 })
+  }
   const { filename } = await context.params
 
   // Basic filename validation to avoid path traversal

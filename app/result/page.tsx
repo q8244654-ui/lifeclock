@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, useRef, useMemo } from "react"
+import { useEffect, useState, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import Image from "next/image"
@@ -9,12 +9,11 @@ import SocialProofCounter from "@/components/social-proof-counter"
 import GuaranteeBadge from "@/components/guarantee-badge"
 import GuaranteeSection from "@/components/guarantee-section"
 import ForceCard from "@/components/force-card"
-import RevelationCounter from "@/components/revelation-counter"
-import PreviewTeaser from "@/components/preview-teaser"
+// removed RevelationCounter and PreviewTeaser
 import PermissionQuestion from "@/components/permission-question"
 import { computeLifeClockFinalReport } from "@/lib/compute-life-clock-final-report"
 import { analyzeHiddenForces } from "@/lib/analyze-forces"
-import { generateInsights } from "@/lib/generate-insights"
+// removed generateInsights import
 import type { PhaseResult } from "@/lib/types"
 import { useAudio } from "@/hooks/use-audio"
 import { useAutoScroll } from "@/hooks/use-auto-scroll"
@@ -55,8 +54,7 @@ export default function ResultPage() {
   const [userGender, setUserGender] = useState("")
   const [userEmail, setUserEmail] = useState("")
   const [revealedForces, setRevealedForces] = useState<Set<string>>(new Set())
-  const [revelationCount, setRevelationCount] = useState(0)
-  const [showPreview, setShowPreview] = useState(false)
+  const [, setRevelationCount] = useState(0)
   const [showForceQuestion, setShowForceQuestion] = useState(false)
   const [showPermissionQuestion, setShowPermissionQuestion] = useState(false)
   const [permissionType, setPermissionType] = useState<"revelation" | "sensitive" | "deep" | null>(null)
@@ -473,23 +471,7 @@ export default function ResultPage() {
 
   const progressPercentage = (timeLeft / (7 * 60)) * 100
 
-  // Memoize previewRevelations to avoid recalculating on every render
-  const previewRevelations = useMemo(() => {
-    if (!showPreview || !finalReport || !finalReport.profile) {
-      return null
-    }
-    
-    try {
-      const allRevelations = generateInsights(phasesResults, finalReport.profile)
-      return allRevelations.slice(0, 3).map((r, i) => ({
-        text: r.insight,
-        index: i + 1
-      }))
-    } catch (error) {
-      console.error("Error generating preview revelations:", error)
-      return null
-    }
-  }, [showPreview, finalReport, phasesResults])
+  // removed previewRevelations memo and preview logic
 
   const handleForceReveal = (forceName: string) => {
     // Ask for permission for sensitive revelations (Shadow and Fear)
@@ -609,8 +591,7 @@ export default function ResultPage() {
     await showTyping(getTypingDelay("action"))
     addMessage("assistant", "187 people received their report today + 10 personalized ebooks on their report.", "motivation")
 
-    // Show preview teaser
-    setShowPreview(true)
+    // removed preview teaser trigger
 
     // 6. GUARANTEE & REASSURANCE
     await showTyping(getTypingDelay("normal"))
@@ -723,16 +704,7 @@ export default function ResultPage() {
             />
           ))}
 
-          {/* Revelation Counter */}
-          {revelationCount > 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="sticky top-4 z-20"
-            >
-              <RevelationCounter current={revelationCount} total={47} />
-            </motion.div>
-          )}
+          {/* removed Revelation Counter */}
 
           {/* Permission Question */}
           {showPermissionQuestion && permissionType && (
@@ -809,18 +781,7 @@ export default function ResultPage() {
             </motion.div>
           )}
 
-          {/* Preview Teaser - Stays visible once shown */}
-          {previewRevelations && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="fixed top-4 left-1/2 transform -translate-x-1/2 w-full max-w-md px-4 z-50"
-            >
-              <PreviewTeaser
-                revelations={previewRevelations}
-              />
-            </motion.div>
-          )}
+          {/* removed Preview Teaser */}
 
           {isTyping && (
             <motion.div

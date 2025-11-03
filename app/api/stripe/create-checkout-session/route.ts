@@ -81,6 +81,14 @@ export async function POST(request: Request) {
         cancel_url: `${baseUrl}/result`,
         // Set checkout page language to English
         locale: 'en',
+        // Allow customers to enter promotion codes on the hosted Checkout page
+        allow_promotion_codes: true,
+        // Display a short message near the submit area on Checkout
+        custom_text: {
+          submit: {
+            message: '7-day money-back guarantee',
+          },
+        },
         // Don't pre-fill email - let customer enter it themselves in checkout
         // customer_email: email || undefined,
         // Apple Pay and Google Pay are automatically enabled when payment_method_types includes "card"

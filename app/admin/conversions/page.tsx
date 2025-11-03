@@ -333,17 +333,35 @@ export default function AdminConversionsPage() {
 
         <div className="mt-10 rounded-xl border border-white/10 bg-black/40 p-5">
           <div className="text-sm text-gray-400">Derniers événements</div>
-          <div className="mt-3 text-sm text-gray-300 space-y-1 max-h-64 overflow-auto">
-            {rows.slice(-50).reverse().map((r, i) => (
-              <div key={i} className="flex items-center justify-between">
-                <span className="text-gray-400">{new Date(r.created_at).toLocaleString()}</span>
-                <span className="px-2 py-0.5 rounded bg-white/5 border border-white/10 text-white">
-                  {r.event_type}
-                </span>
-                <span className="text-gray-400 truncate max-w-[30%]">{r.session_id}</span>
-                <span className="text-gray-400 truncate max-w-[30%]">{r.email || "-"}</span>
-              </div>
-            ))}
+          <div className="mt-3 overflow-x-auto max-h-80">
+            <table className="w-full text-sm text-left text-gray-300">
+              <thead className="sticky top-0 bg-black/60 backdrop-blur border-b border-white/10 text-gray-400">
+                <tr>
+                  <th className="px-3 py-2 font-normal w-[200px]">Horodatage</th>
+                  <th className="px-3 py-2 font-normal w-[160px]">Événement</th>
+                  <th className="px-3 py-2 font-normal">Session</th>
+                  <th className="px-3 py-2 font-normal w-[260px]">Email</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-white/5">
+                {rows.slice(-50).reverse().map((r, i) => (
+                  <tr key={i} className="hover:bg-white/5">
+                    <td className="px-3 py-2 text-gray-400 whitespace-nowrap">{new Date(r.created_at).toLocaleString()}</td>
+                    <td className="px-3 py-2">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded bg-white/5 border border-white/10 text-white capitalize">
+                        {r.event_type.replaceAll("_", " ")}
+                      </span>
+                    </td>
+                    <td className="px-3 py-2 max-w-[280px]">
+                      <span className="block truncate text-gray-300" title={r.session_id}>{r.session_id}</span>
+                    </td>
+                    <td className="px-3 py-2 max-w-[260px]">
+                      <span className="block truncate text-gray-300" title={r.email ?? undefined}>{r.email || "-"}</span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
