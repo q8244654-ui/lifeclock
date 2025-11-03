@@ -1,6 +1,5 @@
 import { NextRequest } from 'next/server'
-import { createReadStream, statSync } from 'fs'
-import { Readable } from 'stream'
+import { statSync, readFileSync } from 'fs'
 import path from 'path'
 
 export const runtime = 'nodejs'
@@ -27,9 +26,9 @@ export async function GET(req: NextRequest, context: { params: Promise<{ filenam
       return new Response('Not found', { status: 404 })
     }
 
-    // Create a stream to serve the file as-is without buffering/transformation
-    const nodeStream = createReadStream(filePath)
-    const webStream = Readable.toWeb(nodeStream) as ReadableStream
+    // Read the entire file as Buffer to ensure complete and correct transmission
+    // This avoids stream conversion issues that can corrupt PDF files
+    const fileBuffer = readFileSync(filePath)
 
     // Infer content type from extension (PDF primary use-case)
     const ext = path.extname(decodedFilename).toLowerCase()
@@ -41,11 +40,12 @@ export async function GET(req: NextRequest, context: { params: Promise<{ filenam
     // If mode=view, display inline. Otherwise, force download (default behavior)
     const disposition = mode === 'view' ? 'inline' : 'attachment'
 
-    // Stream response with correct headers; omit Content-Length to let platform handle it
+    // Response headers with Content-Length for proper file transmission
     const headers = new Headers({
       'Content-Type': contentType,
       // Allow inline viewing when mode=view, otherwise force download
       'Content-Disposition': `${disposition}; filename="${encodeURIComponent(decodedFilename)}"`,
+      'Content-Length': fileBuffer.length.toString(),
       'Accept-Ranges': 'bytes',
       'Cache-Control': 'public, max-age=31536000, immutable',
       // Allow embedding in iframe for same origin
@@ -60,7 +60,8 @@ export async function GET(req: NextRequest, context: { params: Promise<{ filenam
       headers.delete('Content-Security-Policy')
     }
 
-    return new Response(webStream, {
+    // Return the Buffer directly - Next.js will handle the conversion to Response body
+    return new Response(fileBuffer, {
       status: 200,
       headers,
     })
