@@ -77,12 +77,14 @@ export async function POST(request: Request) {
     console.log('[PDF API] PDF generated successfully, size:', pdfBuffer.length)
 
     // Return PDF with explicit Content-Length using native Response
-    // Ensure Buffer is properly converted to Uint8Array for binary transmission
+    // Convert Buffer to ArrayBuffer for Web API Response compatibility
+    // generateReportPDF returns a Buffer, so we convert it to ArrayBuffer for Response BodyInit
     const size = pdfBuffer.length
-    // Convert Buffer to Uint8Array ensuring proper binary format
-    const pdfBody = pdfBuffer instanceof Uint8Array ? pdfBuffer : new Uint8Array(pdfBuffer)
+    // Convert Buffer to ArrayBuffer which is universally accepted by Response BodyInit
+    // Using Uint8Array as intermediate step ensures compatibility with both Node.js and Edge runtime
+    const arrayBuffer: ArrayBuffer = new Uint8Array(pdfBuffer).buffer
 
-    return new Response(pdfBody, {
+    return new Response(arrayBuffer, {
       headers: {
         'Content-Type': 'application/pdf',
         'Content-Disposition': `attachment; filename="LifeClock-${userName}-${Date.now()}.pdf"`,
