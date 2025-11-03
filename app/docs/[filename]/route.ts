@@ -30,6 +30,10 @@ export async function GET(req: NextRequest, context: { params: Promise<{ filenam
     // This avoids stream conversion issues that can corrupt PDF files
     const fileBuffer = readFileSync(filePath)
 
+    // Convert Buffer to Uint8Array for better compatibility with Next.js Response
+    // This ensures the binary data is properly transmitted without corruption
+    const uint8Array = new Uint8Array(fileBuffer)
+
     // Infer content type from extension (PDF primary use-case)
     const ext = path.extname(decodedFilename).toLowerCase()
     const contentType = ext === '.pdf' ? 'application/pdf' : 'application/octet-stream'
@@ -45,7 +49,7 @@ export async function GET(req: NextRequest, context: { params: Promise<{ filenam
       'Content-Type': contentType,
       // Allow inline viewing when mode=view, otherwise force download
       'Content-Disposition': `${disposition}; filename="${encodeURIComponent(decodedFilename)}"`,
-      'Content-Length': fileBuffer.length.toString(),
+      'Content-Length': uint8Array.length.toString(),
       'Accept-Ranges': 'bytes',
       'Cache-Control': 'public, max-age=31536000, immutable',
       // Allow embedding in iframe for same origin
@@ -60,8 +64,9 @@ export async function GET(req: NextRequest, context: { params: Promise<{ filenam
       headers.delete('Content-Security-Policy')
     }
 
-    // Return the Buffer directly - Next.js will handle the conversion to Response body
-    return new Response(fileBuffer, {
+    // Return Uint8Array instead of Buffer for better Next.js compatibility
+    // Uint8Array is the standard Web API format for binary data
+    return new Response(uint8Array, {
       status: 200,
       headers,
     })

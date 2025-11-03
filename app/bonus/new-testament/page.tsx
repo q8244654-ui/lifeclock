@@ -12,17 +12,34 @@ export default function NewTestamentPage() {
   const [downloading, setDownloading] = useState(false)
   const [isViewing, setIsViewing] = useState(false)
 
-  const handleDownload = () => {
+  const handleDownload = async () => {
     setDownloading(true)
     try {
-      // Téléchargement direct via la route API qui sert les fichiers de public/docs
-      // sans compression, identiques aux fichiers originaux
+      // Use fetch to download the file as blob for better reliability
+      // This ensures the PDF is correctly downloaded without corruption
+      const response = await fetch(`/docs/${encodeURIComponent(FILENAME)}`)
+
+      if (!response.ok) {
+        throw new Error(`Failed to download: ${response.status} ${response.statusText}`)
+      }
+
+      // Get the blob from the response
+      const blob = await response.blob()
+
+      // Create a download link with the blob
+      const url = window.URL.createObjectURL(blob)
       const link = document.createElement('a')
-      link.href = `/docs/${encodeURIComponent(FILENAME)}`
+      link.href = url
       link.download = FILENAME
+      link.rel = 'noopener'
       document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
+
+      try {
+        link.click()
+      } finally {
+        document.body.removeChild(link)
+        window.URL.revokeObjectURL(url)
+      }
     } catch (error) {
       console.error('Error triggering download:', error)
       alert('Erreur lors du téléchargement. Veuillez réessayer.')
