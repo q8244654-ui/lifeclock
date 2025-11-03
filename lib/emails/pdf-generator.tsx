@@ -513,12 +513,7 @@ export async function generateReportPDF(
       console.log('[PDF Generator] PDF instance created successfully, generating buffer...')
 
       console.log('[PDF Generator] Calling toBuffer()...')
-      const buffer: Buffer = await new Promise((resolve, reject) => {
-        pdfInstance
-          .toBuffer()
-          .then((buf: Buffer) => resolve(buf))
-          .catch((err: unknown) => reject(err))
-      })
+      const buffer: Buffer = (await pdfInstance.toBuffer()) as unknown as Buffer
       console.log('[PDF Generator] Buffer generated successfully, size:', buffer.length, 'bytes')
 
       if (!buffer || buffer.length === 0) {

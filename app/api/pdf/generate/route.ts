@@ -78,8 +78,8 @@ export async function POST(request: Request) {
 
     // Return PDF with explicit Content-Length using native Response
     const size = pdfBuffer.length
-    const body = new Uint8Array(pdfBuffer)
-    return new Response(body, {
+    const pdfBody = new Uint8Array(pdfBuffer)
+    return new Response(pdfBody, {
       headers: {
         'Content-Type': 'application/pdf',
         'Content-Disposition': `attachment; filename="LifeClock-${userName}-${Date.now()}.pdf"`,
