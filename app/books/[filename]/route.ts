@@ -1,14 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import crypto from 'crypto'
 import { promises as fs } from 'fs'
 import path from 'path'
 
 export const runtime = 'nodejs'
-
-function verifySignature(value: string, sig: string, secret: string) {
-  const expected = crypto.createHmac('sha256', secret).update(value).digest('hex')
-  return crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(sig))
-}
 
 export async function GET(_req: NextRequest, context: { params: Promise<{ filename: string }> }) {
   const { filename: rawName } = await context.params
@@ -38,7 +32,10 @@ export async function GET(_req: NextRequest, context: { params: Promise<{ filena
     const ext = path.extname(decodedFilename).toLowerCase()
     const contentType = ext === '.pdf' ? 'application/pdf' : 'application/octet-stream'
 
-    return new NextResponse(fileBuffer, {
+    // Convert Buffer to Uint8Array for proper binary handling in production
+    const fileBody = new Uint8Array(fileBuffer)
+
+    return new NextResponse(fileBody, {
       status: 200,
       headers: {
         'Content-Type': contentType,
