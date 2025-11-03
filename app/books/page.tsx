@@ -121,6 +121,36 @@ export default function BooksPage() {
               Complimentary guides that expand on your LifeClock revelations
             </p>
 
+            {/* Google Drive Info Text */}
+            <motion.div
+              className="mb-10 max-w-2xl mx-auto"
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2, duration: 0.6 }}
+            >
+              <div className="space-y-3">
+                <p
+                  className="text-[#BFBFC2] text-base md:text-lg"
+                  style={{ fontFamily: 'var(--font-body)' }}
+                >
+                  🗝️ For your convenience, your ebooks are securely hosted on Google Drive.
+                </p>
+                <p
+                  className="text-[#BFBFC2] text-base md:text-lg"
+                  style={{ fontFamily: 'var(--font-body)' }}
+                >
+                  This ensures instant access, smooth downloads, and compatibility with all devices.
+                </p>
+                <p
+                  className="text-[#BFBFC2] text-base md:text-lg"
+                  style={{ fontFamily: 'var(--font-body)' }}
+                >
+                  🔓 Click below to open your private library.
+                </p>
+              </div>
+            </motion.div>
+
             {/* Download Button */}
             <motion.a
               href={GOOGLE_DRIVE_LINK}

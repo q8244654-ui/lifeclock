@@ -132,6 +132,43 @@ export default function NewTestamentPage() {
             </p>
           </motion.div>
 
+          {/* Google Drive Info Text */}
+          <motion.div
+            className="mb-10 max-w-2xl mx-auto"
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2, duration: 0.6 }}
+          >
+            <div className="space-y-3">
+              <p
+                className="text-[#BFBFC2] text-base md:text-lg"
+                style={{ fontFamily: 'var(--font-body)' }}
+              >
+                📖 To ensure pure simplicity and universal access,
+              </p>
+              <p
+                className="text-[#BFBFC2] text-base md:text-lg"
+                style={{ fontFamily: 'var(--font-body)' }}
+              >
+                the New Testament is hosted on Google Drive —
+              </p>
+              <p
+                className="text-[#BFBFC2] text-base md:text-lg"
+                style={{ fontFamily: 'var(--font-body)' }}
+              >
+                so that light and wisdom remain within everyone&apos;s reach, anytime, anywhere.
+              </p>
+              <div className="h-4" />
+              <p
+                className="text-[#BFBFC2] text-base md:text-lg"
+                style={{ fontFamily: 'var(--font-body)' }}
+              >
+                🔓 Access the Scriptures
+              </p>
+            </div>
+          </motion.div>
+
           <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
             {/* Download Button */}
             <motion.a
