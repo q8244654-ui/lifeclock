@@ -3,6 +3,8 @@ import { cookies } from 'next/headers'
 import Stripe from 'stripe'
 import crypto from 'crypto'
 
+export const runtime = 'nodejs'
+
 function signValue(value: string, secret: string): string {
   return crypto.createHmac('sha256', secret).update(value).digest('hex')
 }

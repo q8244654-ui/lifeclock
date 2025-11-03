@@ -28,12 +28,7 @@ import {
   getAdminNewPaymentTemplate,
   getAdminMilestoneTemplate,
 } from './templates'
-
-/**
- * Configuration: nom du fichier PDF statique dans public/docs
- * Ce fichier sera envoyé en pièce jointe dans les emails de confirmation
- */
-const REPORT_PDF_FILENAME = 'LifeClock-Report.pdf' // Modifiez selon votre fichier
+import { readReportPDF } from './file-reader'
 
 const resendApiKey = process.env.RESEND_API_KEY
 const fromEmail = process.env.RESEND_FROM_EMAIL || 'noreply@lifeclock.quest'
@@ -119,19 +114,8 @@ export async function sendPaymentConfirmationEmail(data: PaymentConfirmationData
     const booksUrl = data.booksUrl || `${baseUrl}/books`
     const bonusUrl = data.bonusUrl || `${baseUrl}/bonus/new-testament`
 
-    let pdfBuffer: Buffer | null = null
-    try {
-      // Import dynamique de fs/promises et path seulement côté serveur
-      const { readFile } = await import('fs/promises')
-      const pathModule = (await import('path')) as typeof import('path')
-      // Lire le fichier PDF statique depuis public/docs
-      const filePath = pathModule.join(process.cwd(), 'public', 'docs', REPORT_PDF_FILENAME)
-      pdfBuffer = await readFile(filePath)
-      console.log('[Email] PDF file loaded successfully:', filePath)
-    } catch (error) {
-      console.error('[Email] Error reading PDF file:', error)
-      // Continue without PDF if file not found
-    }
+    // Lire le fichier PDF statique depuis public/docs
+    const pdfBuffer = await readReportPDF()
 
     const html = getPaymentConfirmationTemplate({
       userName: data.userName,

@@ -60,6 +60,20 @@ const nextConfig = {
   serverExternalPackages: ['@react-pdf/renderer'],
   // Turbopack config - empty to use defaults (Turbopack is default in Next.js 16)
   turbopack: {},
+  // Configuration webpack pour exclure les modules Node.js du bundle client
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        path: false,
+        'fs/promises': false,
+        'node:fs/promises': false,
+        'node:path': false,
+      }
+    }
+    return config
+  },
   async headers() {
     return [
       {
