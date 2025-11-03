@@ -3,34 +3,26 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
-import { BookOpen, FileText, Eye } from 'lucide-react'
-import { PDFModal } from '@/components/pdf-viewer'
+import { BookOpen, FileText } from 'lucide-react'
+import { downloadPDF } from '@/lib/pdf-download'
 
 const FILENAME = 'The New Testament.pdf'
 
 export default function NewTestamentPage() {
   const [downloading, setDownloading] = useState(false)
-  const [isViewing, setIsViewing] = useState(false)
 
-  const handleDownload = () => {
-    setDownloading(true)
+  const handleDownload = async () => {
     try {
-      // Direct download from static file - Next.js serves files from /public/docs/ directly
-      // This ensures no corruption as files are served as-is without any transformation
-      const link = document.createElement('a')
-      link.href = `/docs/${encodeURIComponent(FILENAME)}`
-      link.download = FILENAME
-      link.rel = 'noopener'
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
+      await downloadPDF(FILENAME, {
+        downloadName: FILENAME,
+        onProgress: loading => {
+          setDownloading(loading)
+        },
+      })
     } catch (error) {
-      console.error('Error triggering download:', error)
+      console.error('Error downloading PDF:', error)
       alert('Erreur lors du téléchargement. Veuillez réessayer.')
-    } finally {
-      setTimeout(() => {
-        setDownloading(false)
-      }, 600)
+      setDownloading(false)
     }
   }
   return (
@@ -158,28 +150,6 @@ export default function NewTestamentPage() {
           </motion.div>
 
           <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
-            {/* View Button */}
-            <motion.button
-              onClick={() => setIsViewing(true)}
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.98 }}
-              className="flex-1 px-6 py-4 rounded-xl text-[#0A0A0A] font-semibold relative overflow-hidden flex items-center justify-center gap-3 font-[var(--font-body)] bg-linear-to-br from-[rgba(229,201,126,0.9)] to-[rgba(229,201,126,0.7)] shadow-[0_4px_16px_rgba(229,201,126,0.3)]"
-            >
-              <motion.div
-                className="absolute inset-0 bg-[radial-gradient(circle,rgba(255,255,255,0.2)_0%,transparent_70%)]"
-                animate={{ opacity: [0.3, 0.6, 0.3], scale: [1, 1.2, 1] }}
-                transition={{
-                  duration: 2,
-                  repeat: Number.POSITIVE_INFINITY,
-                  ease: 'easeInOut',
-                }}
-              />
-              <span className="relative z-10 flex items-center gap-3">
-                <Eye className="w-5 h-5" />
-                Voir le PDF
-              </span>
-            </motion.button>
-
             {/* Download Button */}
             <motion.button
               onClick={handleDownload}
@@ -212,15 +182,6 @@ export default function NewTestamentPage() {
               </span>
             </motion.button>
           </div>
-
-          {/* PDF Modal */}
-          <PDFModal
-            filename={FILENAME}
-            isOpen={isViewing}
-            onClose={() => setIsViewing(false)}
-            basePath="/docs"
-            showDownload={true}
-          />
 
           <motion.div
             className="text-center mt-10"

@@ -1,8 +1,9 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Download } from 'lucide-react'
+import { downloadPDF } from '@/lib/pdf-download'
 
 interface PDFModalProps {
   /** PDF filename to display */
@@ -11,7 +12,7 @@ interface PDFModalProps {
   isOpen: boolean
   /** Function called to close the modal */
   onClose: () => void
-  /** Base path for PDFs (default: /pdfs) */
+  /** Base path for PDFs (default: /docs) */
   basePath?: string
   /** External URL for PDF (overrides basePath if provided) */
   externalUrl?: string
@@ -23,7 +24,7 @@ export default function PDFModal({
   filename,
   isOpen,
   onClose,
-  basePath = '/pdfs',
+  basePath = '/docs',
   externalUrl,
   showDownload = true,
 }: PDFModalProps) {
@@ -50,23 +51,30 @@ export default function PDFModal({
     }
   }, [isOpen])
 
+  const [downloading, setDownloading] = useState(false)
   const pdfUrl = externalUrl || `${basePath}/${encodeURIComponent(filename)}`
   const isExternal = externalUrl
     ? true
     : pdfUrl.startsWith('http://') || pdfUrl.startsWith('https://')
 
-  const handleDownload = () => {
+  const handleDownload = async () => {
     if (isExternal) {
       // For external URLs, open in new tab
       window.open(pdfUrl, '_blank', 'noopener,noreferrer')
     } else {
-      // For local files, trigger download
-      const link = document.createElement('a')
-      link.href = `${pdfUrl}?mode=download`
-      link.download = filename
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
+      // For local files, use the robust download function
+      try {
+        await downloadPDF(filename, {
+          downloadName: filename,
+          onProgress: loading => {
+            setDownloading(loading)
+          },
+        })
+      } catch (error) {
+        console.error('Error downloading PDF:', error)
+        alert('Erreur lors du téléchargement. Veuillez réessayer.')
+        setDownloading(false)
+      }
     }
   }
 
@@ -95,12 +103,17 @@ export default function PDFModal({
                 {showDownload && (
                   <motion.button
                     onClick={handleDownload}
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    className="bg-[#2A2A2A] hover:bg-[#3A3A3A] text-white p-2 rounded-lg transition-colors"
-                    title="Download"
+                    disabled={downloading}
+                    whileHover={{ scale: downloading ? 1 : 1.1 }}
+                    whileTap={{ scale: downloading ? 1 : 0.9 }}
+                    className="bg-[#2A2A2A] hover:bg-[#3A3A3A] text-white p-2 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    title={downloading ? 'Téléchargement...' : 'Télécharger'}
                   >
-                    <Download className="w-5 h-5" />
+                    {downloading ? (
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      <Download className="w-5 h-5" />
+                    )}
                   </motion.button>
                 )}
                 <motion.button

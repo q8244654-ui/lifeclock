@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { BookOpen, Eye, FileText } from 'lucide-react'
 import { PDFModal } from '@/components/pdf-viewer'
+import { downloadPDF } from '@/lib/pdf-download'
 import { computeLifeClockFinalReport } from '@/lib/compute-life-clock-final-report'
 import { analyzeHiddenForces } from '@/lib/analyze-forces'
 import { generateInsights } from '@/lib/generate-insights'
@@ -30,6 +31,7 @@ export default function ReportPage() {
   const [userName, setUserName] = useState('')
   const [userEmail, setUserEmail] = useState('')
   const [isViewingPDF, setIsViewingPDF] = useState(false)
+  const [downloadingPDF, setDownloadingPDF] = useState(false)
 
   function saveReportToSupabase(
     results: PhaseResult[],
@@ -391,12 +393,25 @@ export default function ReportPage() {
                   </motion.button>
 
                   {/* Download Button */}
-                  <motion.a
-                    href="/docs/The%20New%20Testament.pdf"
-                    download
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="px-6 py-4 rounded-xl text-[#0A0A0A] font-semibold relative overflow-hidden flex items-center justify-center gap-3"
+                  <motion.button
+                    onClick={async () => {
+                      try {
+                        await downloadPDF('The New Testament.pdf', {
+                          downloadName: 'The New Testament.pdf',
+                          onProgress: loading => {
+                            setDownloadingPDF(loading)
+                          },
+                        })
+                      } catch (error) {
+                        console.error('Error downloading PDF:', error)
+                        alert('Erreur lors du téléchargement. Veuillez réessayer.')
+                        setDownloadingPDF(false)
+                      }
+                    }}
+                    disabled={downloadingPDF}
+                    whileHover={{ scale: downloadingPDF ? 1 : 1.05 }}
+                    whileTap={{ scale: downloadingPDF ? 1 : 0.95 }}
+                    className="px-6 py-4 rounded-xl text-[#0A0A0A] font-semibold relative overflow-hidden flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
                     style={{
                       background:
                         'linear-gradient(135deg, rgba(229, 201, 126, 0.9) 0%, rgba(229, 201, 126, 0.7) 100%)',
@@ -404,24 +419,35 @@ export default function ReportPage() {
                       boxShadow: '0 4px 16px rgba(229, 201, 126, 0.3)',
                     }}
                   >
-                    <motion.div
-                      className="absolute inset-0"
-                      style={{
-                        background:
-                          'radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 70%)',
-                      }}
-                      animate={{ opacity: [0.3, 0.6, 0.3], scale: [1, 1.2, 1] }}
-                      transition={{
-                        duration: 2,
-                        repeat: Number.POSITIVE_INFINITY,
-                        ease: 'easeInOut',
-                      }}
-                    />
+                    {!downloadingPDF && (
+                      <motion.div
+                        className="absolute inset-0"
+                        style={{
+                          background:
+                            'radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 70%)',
+                        }}
+                        animate={{ opacity: [0.3, 0.6, 0.3], scale: [1, 1.2, 1] }}
+                        transition={{
+                          duration: 2,
+                          repeat: Number.POSITIVE_INFINITY,
+                          ease: 'easeInOut',
+                        }}
+                      />
+                    )}
                     <span className="relative z-10 flex items-center gap-3">
-                      <FileText className="w-5 h-5" />
-                      Télécharger
+                      {downloadingPDF ? (
+                        <>
+                          <div className="w-5 h-5 border-2 border-[#0A0A0A] border-t-transparent rounded-full animate-spin" />
+                          <span>Téléchargement...</span>
+                        </>
+                      ) : (
+                        <>
+                          <FileText className="w-5 h-5" />
+                          Télécharger
+                        </>
+                      )}
                     </span>
-                  </motion.a>
+                  </motion.button>
                 </div>
 
                 {/* PDF Modal */}
