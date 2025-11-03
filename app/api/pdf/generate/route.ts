@@ -77,13 +77,17 @@ export async function POST(request: Request) {
     console.log('[PDF API] PDF generated successfully, size:', pdfBuffer.length)
 
     // Return PDF with explicit Content-Length using native Response
+    // Ensure Buffer is properly converted to Uint8Array for binary transmission
     const size = pdfBuffer.length
-    const pdfBody = new Uint8Array(pdfBuffer)
+    // Convert Buffer to Uint8Array ensuring proper binary format
+    const pdfBody = pdfBuffer instanceof Uint8Array ? pdfBuffer : new Uint8Array(pdfBuffer)
+
     return new Response(pdfBody, {
       headers: {
         'Content-Type': 'application/pdf',
         'Content-Disposition': `attachment; filename="LifeClock-${userName}-${Date.now()}.pdf"`,
         'Content-Length': String(size),
+        'Content-Encoding': 'none', // Prevent Vercel/Next.js automatic compression that corrupts binary files
         'Cache-Control': 'no-store',
       },
     })

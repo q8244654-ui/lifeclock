@@ -44,8 +44,10 @@ export async function exportPDFReport(data: PDFExportData): Promise<void> {
       throw new Error(errorMessage)
     }
 
-    // Get the PDF blob
-    const blob = await response.blob()
+    // Get the PDF as ArrayBuffer for proper binary handling
+    // This ensures the binary data is not corrupted during transmission
+    const arrayBuffer = await response.arrayBuffer()
+    const blob = new Blob([arrayBuffer], { type: 'application/pdf' })
 
     // Create download link
     const url = window.URL.createObjectURL(blob)
