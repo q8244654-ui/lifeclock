@@ -14,11 +14,33 @@ import { spacing } from './pdf-styles'
 
 // Register fonts before first use
 let fontsRegistered = false
+let fontsRegistrationAttempted = false
 
-async function ensureFontsRegistered() {
-  if (!fontsRegistered) {
+/**
+ * Ensure fonts are registered, but never throw errors
+ * PDF generation will continue with Helvetica fallback if fonts fail
+ */
+async function ensureFontsRegistered(): Promise<void> {
+  // Only attempt registration once
+  if (fontsRegistrationAttempted) {
+    return
+  }
+
+  fontsRegistrationAttempted = true
+
+  try {
     await registerFonts()
     fontsRegistered = true
+    console.log('[PDF Generator] Font registration completed successfully')
+  } catch (error) {
+    // Never throw - always allow PDF generation to continue
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    console.warn(
+      '[PDF Generator] Font registration failed, but continuing with fallback fonts:',
+      errorMessage
+    )
+    fontsRegistered = false
+    // PDF will use built-in Helvetica font as fallback
   }
 }
 
@@ -488,10 +510,26 @@ export async function generateReportPDF(
       userName: validUserName,
     })
 
-    // Ensure fonts are registered
+    // Ensure fonts are registered (non-blocking - uses fallback if it fails)
     console.log('[PDF Generator] Registering fonts...')
-    await ensureFontsRegistered()
-    console.log('[PDF Generator] Fonts registered')
+    try {
+      await ensureFontsRegistered()
+      if (fontsRegistered) {
+        console.log('[PDF Generator] Custom fonts registered successfully')
+      } else {
+        console.log(
+          '[PDF Generator] Using built-in Helvetica font as fallback (custom fonts unavailable)'
+        )
+      }
+    } catch (fontError) {
+      // Should never happen due to error handling in ensureFontsRegistered,
+      // but extra safety to ensure PDF generation never fails due to fonts
+      const fontErrorMessage = fontError instanceof Error ? fontError.message : String(fontError)
+      console.warn(
+        '[PDF Generator] Font registration encountered error, continuing with fallback:',
+        fontErrorMessage
+      )
+    }
 
     // Create PDF document
     console.log('[PDF Generator] Creating document component...')
