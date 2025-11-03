@@ -28,3 +28,9 @@ next-env.d.ts
 
 # archives locales à ne pas versionner
 lifeclock-project.zip
+
+# lockfiles non utilisés
+package-lock.json
+
+# ebooks dupliqués (servir depuis public/books uniquement)
+app/books/*.pdf
