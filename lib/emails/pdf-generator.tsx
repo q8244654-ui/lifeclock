@@ -542,16 +542,22 @@ export async function generateReportPDF(
       />
     )
 
-    // Render PDF directly to buffer (Node.js compatible)
+    // Render PDF to blob first, then convert to buffer for better compatibility
+    // This method is more reliable than toBuffer() and works consistently across environments
     console.log('[PDF Generator] Rendering PDF to buffer...')
     try {
-      // Use pdf().toBuffer() for Node.js server-side rendering
       console.log('[PDF Generator] Creating PDF instance from document...')
       const pdfInstance = pdf(doc)
-      console.log('[PDF Generator] PDF instance created successfully, generating buffer...')
+      console.log('[PDF Generator] PDF instance created successfully, generating blob...')
 
-      console.log('[PDF Generator] Calling toBuffer()...')
-      const buffer: Buffer = (await pdfInstance.toBuffer()) as unknown as Buffer
+      // Use toBlob() which is more reliable than toBuffer()
+      console.log('[PDF Generator] Calling toBlob()...')
+      const blob = await pdfInstance.toBlob()
+      console.log('[PDF Generator] Blob created successfully, size:', blob.size, 'bytes')
+
+      // Convert blob to ArrayBuffer then to Buffer for Node.js compatibility
+      const arrayBuffer = await blob.arrayBuffer()
+      const buffer = Buffer.from(arrayBuffer)
       console.log('[PDF Generator] Buffer generated successfully, size:', buffer.length, 'bytes')
 
       if (!buffer || buffer.length === 0) {

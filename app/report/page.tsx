@@ -355,7 +355,7 @@ export default function ReportPage() {
                 </p>
 
                 <motion.a
-                  href="/books/The%20New%20Testament_compressed.pdf"
+                  href="/docs/The%20New%20Testament_compressed.pdf"
                   download
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
