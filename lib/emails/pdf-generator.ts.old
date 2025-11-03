@@ -1,0 +1,264 @@
+/**
+ * Generate a beautiful PDF report with modern UI design
+ * Using @react-pdf/renderer for proper UTF-8 encoding and typography
+ * 
+ * This file MUST only be used server-side (API routes, server actions, etc.)
+ */
+
+import React from 'react'
+import { pdf } from '@react-pdf/renderer'
+import { Document, Page, View, Text } from '@react-pdf/renderer'
+import { registerFonts } from './pdf-fonts'
+import {
+  PDFCoverPage,
+  PDFForcesSection,
+  PDFRevelationsChapter,
+  PDFRevelationCard,
+  PDFTransition,
+} from './pdf-components'
+import { spacing } from './pdf-styles'
+
+// Register fonts before first use
+let fontsRegistered = false
+
+async function ensureFontsRegistered() {
+  if (!fontsRegistered) {
+    await registerFonts()
+    fontsRegistered = true
+  }
+}
+
+/**
+ * Main PDF Document Component
+ */
+const LifeClockDocument: React.FC<{
+  reportData: any
+  forces: any
+  revelations: any[]
+  userName: string
+}> = ({ reportData, forces, revelations, userName }) => {
+  // Ensure forces is a valid object (handle null, undefined, arrays, etc.)
+  const validForces = forces && typeof forces === 'object' && !Array.isArray(forces) && forces !== null ? forces : {}
+  
+  const cardsPerPage = 3
+  const revelationPages = revelations && revelations.length > 0
+    ? Array.from({ length: Math.ceil(revelations.length / cardsPerPage) })
+    : []
+
+  return (
+    <Document>
+      {/* Page 1: Cover */}
+      <PDFCoverPage
+        userName={userName}
+        lifeIndex={reportData?.lifeIndex?.lifeIndex || 0}
+        stage={reportData?.lifeIndex?.stage || 'Unknown'}
+        dominantEnergy={reportData?.profile?.dominantEnergy || 'Unknown'}
+        pageNumber={1}
+        isOddPage={true}
+      />
+
+      {/* Page 2: Forces Section */}
+      <PDFForcesSection
+        forces={validForces}
+        pageNumber={2}
+        isOddPage={false}
+      />
+
+      {/* Page 3: Chapter Page */}
+      <PDFRevelationsChapter
+        pageNumber={3}
+        isOddPage={true}
+      />
+
+      {/* Pages 4+: Revelations with transitions */}
+      {revelationPages.map((_, pageIdx) => {
+        const startIdx = pageIdx * cardsPerPage
+        const endIdx = Math.min(startIdx + cardsPerPage, revelations.length)
+        const pageRevelations = revelations.slice(startIdx, endIdx)
+        const pageNumber = 4 + pageIdx
+        const isOdd = pageNumber % 2 === 1
+
+        // Strategic transition points
+        const shouldAddTransition =
+          pageIdx === 0 ||
+          pageIdx === Math.floor(revelationPages.length / 2)
+
+        const transitionPhrases = [
+          '— The revelations begin —',
+          '— The pattern deepens —',
+          '— Time shifts its shape —',
+        ]
+
+        return (
+          <Page
+            key={`revelations-page-${pageIdx}`}
+            size="A4"
+            style={{
+              backgroundColor: '#0A0A0A',
+              paddingTop: spacing.page.marginTop,
+              paddingBottom: spacing.page.marginBottom,
+            }}
+          >
+            {/* Header */}
+            <View
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                height: spacing.page.marginTop,
+                paddingHorizontal: spacing.page.marginOuter,
+                borderBottomWidth: 0.5,
+                borderBottomColor: '#38383A',
+                opacity: 0.5,
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: 8,
+                  color: '#A0A0A0',
+                  textAlign: isOdd ? 'right' : 'left',
+                }}
+              >
+                LifeClock Report
+              </Text>
+            </View>
+
+            {/* Content */}
+            <View
+              style={{
+                paddingHorizontal: isOdd ? spacing.page.marginInner : spacing.page.marginOuter,
+                paddingRight: isOdd ? spacing.page.marginOuter : spacing.page.marginInner,
+                paddingTop: 24,
+                paddingBottom: 24,
+              }}
+            >
+              {/* Add transition on strategic pages */}
+              {shouldAddTransition && (
+                <PDFTransition
+                  phrase={transitionPhrases[Math.min(pageIdx, transitionPhrases.length - 1)]}
+                />
+              )}
+
+              {/* Revelation cards */}
+              {pageRevelations.map((revelation, idx) => {
+                // Ensure revelation is a valid object
+                if (!revelation || typeof revelation !== 'object') return null
+                return (
+                  <PDFRevelationCard
+                    key={`rev-${startIdx + idx}`}
+                    revelation={revelation}
+                    index={startIdx + idx + 1}
+                  />
+                )
+              })}
+            </View>
+
+            {/* Footer */}
+            <View
+              style={{
+                position: 'absolute',
+                bottom: 0,
+                left: 0,
+                right: 0,
+                height: spacing.page.marginBottom,
+                borderTopWidth: 0.5,
+                borderTopColor: '#38383A',
+                opacity: 0.5,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                paddingTop: 8,
+              }}
+            >
+              <Text style={{ fontSize: 8, color: '#E5C97E', fontStyle: 'italic', marginBottom: 2 }}>
+                Time is no longer counted. It belongs to you.
+              </Text>
+              <Text
+                style={{
+                  position: 'absolute',
+                  bottom: 8,
+                  fontSize: 8,
+                  color: '#A0A0A0',
+                  ...(isOdd ? { right: spacing.page.marginOuter } : { left: spacing.page.marginOuter }),
+                }}
+              >
+                {pageNumber}
+              </Text>
+            </View>
+          </Page>
+        )
+      })}
+    </Document>
+  )
+}
+
+/**
+ * Generate PDF report
+ */
+export async function generateReportPDF(
+  reportData: any,
+  forces: any,
+  revelations: any[],
+  userName: string
+): Promise<Buffer> {
+  try {
+    console.log('[PDF Generator] Starting PDF generation...')
+    console.log('[PDF Generator] Data check:', {
+      hasReportData: !!reportData,
+      hasForces: !!forces,
+      revelationsCount: revelations?.length || 0,
+      userName: userName,
+    })
+
+    // Ensure fonts are registered
+    console.log('[PDF Generator] Registering fonts...')
+    await ensureFontsRegistered()
+    console.log('[PDF Generator] Fonts registered')
+
+    // Ensure forces defaults to empty object if invalid
+    const validForces = forces && typeof forces === 'object' && !Array.isArray(forces) && forces !== null ? forces : {}
+    const validRevelations = Array.isArray(revelations) ? revelations : []
+    const validReportData = reportData && typeof reportData === 'object' ? reportData : {}
+
+    // Create PDF document
+    console.log('[PDF Generator] Creating document component...')
+    const doc = (
+      <LifeClockDocument
+        reportData={validReportData}
+        forces={validForces}
+        revelations={validRevelations}
+        userName={userName || 'User'}
+      />
+    )
+
+    // Render PDF to blob and convert to buffer
+    console.log('[PDF Generator] Rendering PDF to buffer...')
+    try {
+      const blob = await pdf(doc).toBlob()
+      const arrayBuffer = await blob.arrayBuffer()
+      const buffer = Buffer.from(arrayBuffer)
+      console.log('[PDF Generator] PDF generated successfully, size:', buffer.length)
+      
+      if (buffer.length === 0) {
+        throw new Error('Generated PDF buffer is empty')
+      }
+      
+      return buffer
+    } catch (renderError) {
+      console.error('[PDF Generator] Error during PDF rendering:', renderError)
+      if (renderError instanceof Error) {
+        console.error('[PDF Generator] Error stack:', renderError.stack)
+      }
+      throw new Error(`PDF rendering failed: ${renderError instanceof Error ? renderError.message : String(renderError)}`)
+    }
+  } catch (error) {
+    console.error('[PDF Generator] Error generating PDF:', error)
+    if (error instanceof Error) {
+      console.error('[PDF Generator] Error stack:', error.stack)
+      console.error('[PDF Generator] Error message:', error.message)
+    }
+    throw error
+  }
+}
