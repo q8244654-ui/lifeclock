@@ -37,10 +37,10 @@ const securityHeaders = [
       "default-src 'self';",
       "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://www.googletagmanager.com;",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;",
-      "img-src 'self' data: blob: https://*.vercel-storage.com https://files.stripe.com https://q.stripe.com;",
+      "img-src 'self' data: blob: https://*.vercel-storage.com https://files.stripe.com https://q.stripe.com https://m.stripe.com;",
       "font-src 'self' https://fonts.gstatic.com;",
-      "connect-src 'self' https://api.stripe.com https://r.stripe.com https://*.supabase.co https://*.ingest.sentry.io https://o*.ingest.sentry.io https://vitals.vercel-insights.com;",
-      "frame-src 'self' https://js.stripe.com;",
+      "connect-src 'self' https://api.stripe.com https://r.stripe.com https://m.stripe.com https://*.supabase.co https://*.ingest.sentry.io https://o*.ingest.sentry.io https://vitals.vercel-insights.com;",
+      "frame-src 'self' https://js.stripe.com https://checkout.stripe.com;",
       "frame-ancestors 'none';",
       "base-uri 'self';",
       "form-action 'self' https://checkout.stripe.com;",
@@ -65,6 +65,14 @@ const nextConfig = {
       {
         source: '/(.*)',
         headers: securityHeaders,
+      },
+    ]
+  },
+  async rewrites() {
+    return [
+      {
+        source: '/favicon.ico',
+        destination: '/favicon.png',
       },
     ]
   },
