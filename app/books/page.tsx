@@ -3,8 +3,9 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { Download, BookOpen, FileText, Eye } from 'lucide-react'
+import { Download, BookOpen, FileText, Eye, ExternalLink } from 'lucide-react'
 import { PDFModal } from '@/components/pdf-viewer'
+import { PDF_CONFIG } from '@/lib/constants'
 
 // Phase colors matching the quiz phases
 const PHASE_COLORS = [
@@ -112,13 +113,20 @@ export default function BooksPage() {
   const handleDownload = (book: (typeof BOOKS)[0]) => {
     setDownloading(book.id)
     try {
-      // Direct download from /public/pdfs/ (static files served by CDN)
-      const link = document.createElement('a')
-      link.href = `/pdfs/${encodeURIComponent(book.filename)}`
-      link.download = book.filename
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
+      const pdfUrl = PDF_CONFIG.getUrl(book.filename)
+
+      // If external URL, open in new tab (redirect)
+      if (pdfUrl.startsWith('http://') || pdfUrl.startsWith('https://')) {
+        window.open(pdfUrl, '_blank', 'noopener,noreferrer')
+      } else {
+        // Local file download
+        const link = document.createElement('a')
+        link.href = pdfUrl
+        link.download = book.filename
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+      }
     } catch (error) {
       console.error('Error triggering download:', error)
       alert('Error downloading. Please try again.')
@@ -127,6 +135,14 @@ export default function BooksPage() {
         setDownloading(null)
       }, 600)
     }
+  }
+
+  const getPdfUrl = (filename: string): string => {
+    return PDF_CONFIG.getUrl(filename)
+  }
+
+  const isExternalUrl = (url: string): boolean => {
+    return url.startsWith('http://') || url.startsWith('https://')
   }
 
   return (
@@ -466,7 +482,12 @@ export default function BooksPage() {
           filename={viewingBook.filename}
           isOpen={!!viewingBook}
           onClose={() => setViewingBook(null)}
-          basePath="/pdfs"
+          basePath={PDF_CONFIG.BASE_URL || '/pdfs'}
+          externalUrl={
+            isExternalUrl(getPdfUrl(viewingBook.filename))
+              ? getPdfUrl(viewingBook.filename)
+              : undefined
+          }
           showDownload={true}
         />
       )}

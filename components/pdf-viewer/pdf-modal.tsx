@@ -13,6 +13,8 @@ interface PDFModalProps {
   onClose: () => void
   /** Base path for PDFs (default: /pdfs) */
   basePath?: string
+  /** External URL for PDF (overrides basePath if provided) */
+  externalUrl?: string
   /** Show download button */
   showDownload?: boolean
 }
@@ -22,6 +24,7 @@ export default function PDFModal({
   isOpen,
   onClose,
   basePath = '/pdfs',
+  externalUrl,
   showDownload = true,
 }: PDFModalProps) {
   // Close with Escape key
@@ -47,15 +50,24 @@ export default function PDFModal({
     }
   }, [isOpen])
 
-  const pdfUrl = `${basePath}/${encodeURIComponent(filename)}`
+  const pdfUrl = externalUrl || `${basePath}/${encodeURIComponent(filename)}`
+  const isExternal = externalUrl
+    ? true
+    : pdfUrl.startsWith('http://') || pdfUrl.startsWith('https://')
 
   const handleDownload = () => {
-    const link = document.createElement('a')
-    link.href = `${pdfUrl}?mode=download`
-    link.download = filename
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
+    if (isExternal) {
+      // For external URLs, open in new tab
+      window.open(pdfUrl, '_blank', 'noopener,noreferrer')
+    } else {
+      // For local files, trigger download
+      const link = document.createElement('a')
+      link.href = `${pdfUrl}?mode=download`
+      link.download = filename
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+    }
   }
 
   return (
@@ -105,7 +117,7 @@ export default function PDFModal({
 
             {/* Iframe with PDF */}
             <iframe
-              src={`${pdfUrl}?mode=view`}
+              src={isExternal ? pdfUrl : `${pdfUrl}?mode=view`}
               className="w-full h-full rounded-xl"
               title={filename}
               style={{
