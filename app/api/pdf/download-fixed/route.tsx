@@ -15,13 +15,15 @@ export async function GET() {
     const pdfInstance = pdf(doc)
     // Use Node-friendly buffer for predictable Content-Length
     const buffer = await pdfInstance.toBuffer()
-    const size = (buffer as unknown as Buffer).length
+    const nodeBuffer = buffer as unknown as Buffer
+    const size = nodeBuffer.length
     console.log(
       '[PDF Fixed] PDF generated successfully',
       size !== undefined ? `(size: ${size} bytes)` : '(stream)'
     )
 
-    return new Response(buffer as unknown as Buffer, {
+    const body = new Uint8Array(nodeBuffer)
+    return new Response(body, {
       headers: {
         'Content-Type': 'application/pdf',
         'Content-Disposition': 'attachment; filename="LifeClock-Report.pdf"',
