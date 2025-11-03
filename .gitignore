@@ -37,9 +37,7 @@ public/.DS_Store
 # lockfiles non utilisés
 package-lock.json
 
-# ebooks dupliqués (servir depuis public/books uniquement)
+# ebooks: servir depuis public/books
 app/books/*.pdf
 app/bonus/new-testament/*.pdf
-public/books/ebook-*.pdf
-!public/books/ebook-7.pdf
-public/books/book-*.pdf
+# Ne pas ignorer les PDFs dans public/books
