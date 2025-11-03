@@ -5,7 +5,7 @@ interface PDFIframeEmbedProps {
   filename: string
   /** Iframe height */
   height?: string
-  /** Base path for PDFs (default: /pdfs) */
+  /** Base path for PDFs (default: /docs) */
   basePath?: string
   /** Additional CSS classes */
   className?: string
@@ -18,7 +18,7 @@ interface PDFIframeEmbedProps {
 export default function PDFIframeEmbed({
   filename,
   height = '600px',
-  basePath = '/pdfs',
+  basePath = '/docs',
   className = '',
 }: PDFIframeEmbedProps) {
   const pdfUrl = `${basePath}/${encodeURIComponent(filename)}`
