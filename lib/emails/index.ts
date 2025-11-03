@@ -1,6 +1,4 @@
 import { Resend } from 'resend'
-import { readFile } from 'fs/promises'
-import path from 'path'
 import type {
   PaymentConfirmationData,
   AbandonedCartData,
@@ -123,8 +121,11 @@ export async function sendPaymentConfirmationEmail(data: PaymentConfirmationData
 
     let pdfBuffer: Buffer | null = null
     try {
+      // Import dynamique de fs/promises et path seulement côté serveur
+      const { readFile } = await import('fs/promises')
+      const pathModule = (await import('path')) as typeof import('path')
       // Lire le fichier PDF statique depuis public/docs
-      const filePath = path.join(process.cwd(), 'public', 'docs', REPORT_PDF_FILENAME)
+      const filePath = pathModule.join(process.cwd(), 'public', 'docs', REPORT_PDF_FILENAME)
       pdfBuffer = await readFile(filePath)
       console.log('[Email] PDF file loaded successfully:', filePath)
     } catch (error) {
